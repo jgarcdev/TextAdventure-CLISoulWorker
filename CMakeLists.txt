@@ -29,6 +29,45 @@ endif()
 
 project(clisw)
 
+# Compile Windows resource (.rc) files to .res using `zig rc` and attach to targets
+find_program(ZIG_EXECUTABLE zig)
+if(NOT ZIG_EXECUTABLE)
+  message(FATAL_ERROR "zig not found; install Zig and ensure 'zig' is on PATH to build .rc resources")
+endif()
+
+set(RESOURCES_DIR "${CMAKE_SOURCE_DIR}/resources")
+set(BINARY_RES_DIR "${CMAKE_BINARY_DIR}/resources")
+file(MAKE_DIRECTORY ${BINARY_RES_DIR})
+
+set(RC_CLISW "${RESOURCES_DIR}/clisw.rc")
+set(RC_LAUNCHER "${RESOURCES_DIR}/launcher.rc")
+set(RES_CLISW "${RESOURCES_DIR}/clisw.res")
+set(RES_LAUNCHER "${RESOURCES_DIR}/launcher.res")
+
+add_custom_command(
+  OUTPUT ${RES_CLISW}
+  COMMAND ${ZIG_EXECUTABLE} rc ${RC_CLISW}
+  DEPENDS ${RC_CLISW}
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  COMMENT "Compiling ${RC_CLISW} -> ${RES_CLISW}"
+)
+
+add_custom_command(
+  OUTPUT ${RES_LAUNCHER}
+  COMMAND ${ZIG_EXECUTABLE} rc ${RC_LAUNCHER}
+  DEPENDS ${RC_LAUNCHER}
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  COMMENT "Compiling ${RC_LAUNCHER} -> ${RES_LAUNCHER}"
+)
+
+add_custom_target(compile_resources DEPENDS ${RES_CLISW} ${RES_LAUNCHER})
+
+# Make sure resources are built before the corresponding executables and add .res as sources
+
+
+
+
+
 set(SOURCES
   external/cJSON.c
   external/getline.c
@@ -43,6 +82,7 @@ set(SOURCES
   control/Keyboard.c
   control/SaveLoad.c
   control/Battle.c
+  ${RES_CLISW}
 )
 
 include_directories(headers)
@@ -75,10 +115,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   "${SDK_LIB_UM}/User32.Lib"
   "${SDK_LIB_UM}/kernel32.lib"
 )
+add_dependencies(${PROJECT_NAME} compile_resources)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-add_executable(clisw-launcher launcher.c external/getopt.c)
+add_executable(clisw-launcher launcher.c external/getopt.c ${RES_LAUNCHER})
 target_include_directories(clisw-launcher PRIVATE ${CMAKE_SOURCE_DIR}/headers ${SDK_INCLUDE_DIRS})
 target_link_directories(clisw-launcher PRIVATE ${X86_LIB_DIR} ${SDK_LIB_UCRT} ${SDK_LIB_UM})
 target_compile_options(clisw-launcher PRIVATE "--target=x86_64-pc-windows-msvc" "-fms-extensions")
@@ -92,6 +133,7 @@ target_link_libraries(clisw-launcher PRIVATE
   "${SDK_LIB_UM}/User32.Lib"
   "${SDK_LIB_UM}/kernel32.lib"
 )
+add_dependencies(clisw-launcher compile_resources)
 
 
 add_executable(clisw-installer installer.c external/getopt.c)
@@ -121,8 +163,8 @@ set(PACKAGE_NAME "clisw_build.zip")
 
 add_custom_target(package
   COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_DIR}
-  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PACKAGE_DIR}/
-  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:clisw-launcher> ${PACKAGE_DIR}/
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}>.exe ${PACKAGE_DIR}/
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:clisw-launcher>.exe ${PACKAGE_DIR}/
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/version ${PACKAGE_DIR}/
   COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_DIR}/data/maps
   COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_DIR}/data/misc

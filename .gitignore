@@ -1,6 +1,8 @@
 /.vscode
 *.o
-clisw*
+clisw
+clisw-installer
+clisw-launcher
 .gdbinit
 *.log
 TODO
@@ -9,6 +11,7 @@ storyboard
 test.c
 CLISW
 build/
+resources/*.res
 
 mate
 
