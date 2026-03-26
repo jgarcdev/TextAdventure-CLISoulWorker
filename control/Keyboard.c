@@ -325,7 +325,7 @@ static void useItem() {
         printf("Invalid count! Try again! ");
         getline(&buffer, &n, stdin);
         count = atoi(buffer);
-      }        
+      }
 
       sellItem(item, count);
     } else if (opt == ITEM_EQUIP) {

@@ -3,8 +3,9 @@ CFLAGS = -Wall -lpthread
 
 INCLUDES = -I. -Iheaders
 
-SRCS = cJSON.c main.c RoomTable.c Setup.c SoulWorker.c Maze.c Error.c Keyboard.c \
-		SaveLoad.c itoa.s DArray.c Misc.c Battle.c
+SRCS = external/cJSON.c main.c structures/RoomTable.c control/Setup.c structures/SoulWorker.c \
+		structures/Maze.c helpers/Error.c control/Keyboard.c \
+		control/SaveLoad.c helpers/itoa.s structures/DArray.c helpers/Misc.c control/Battle.c
 
 HEADERS = headers/cJSON.h headers/Setup.h headers/SoulWorker.h headers/Maze.h headers/Error.h \
 		headers/Keyboard.h headers/SaveLoad.h headers/LoadJSON.h headers/DArray.h headers/Misc.h \

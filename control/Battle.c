@@ -128,7 +128,6 @@ static ushort getTotalDmg(Stats* attacker, Stats* target, Skill* skill) {
     totalDef += (skill->activeEffect2 == DEF) ? skill->effect2.def : 0;
   }
 
-  printf("%d\n", RAND_MAX);
   float hitRoll = (float) rand() / RAND_MAX * (player->lvl * 3);
   // printf("hitroll: %3.2f\n", hitRoll);
   if (hitRoll > totalAcc) return 0;
