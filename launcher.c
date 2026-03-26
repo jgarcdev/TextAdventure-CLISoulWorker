@@ -11,6 +11,7 @@
   #include <direct.h> // replace sys/stat
   #include <process.h> // replace sys/wait
   #include <Windows.h>
+  #include <wininet.h>
 #else
   #include <dirent.h>
   #include <unistd.h>
@@ -62,109 +63,113 @@ static void ssleep(int ms) {
   #endif
 }
 
-/**
- * Creates a bash script that cross-checks the current version with the hosted verion, indicating whether to update or not.
- * @return True if game is latest, false otherwise
- */
-static bool checkLatest() {
-  const char* versionScript;
-  int scriptLen;
 
 #ifdef _WIN64
-  scriptLen = 11;
-  char* scriptContents[] = {
-    "@echo off\n",
-    // "set LATEST_VERSION=alpha-3.1.0\n",
-    "for /f \"tokens=*\" %%i in ('curl -L -H \"Accept: application/vnd.github.raw+json\" https://api.github.com/repos/Mnemos-Parasynthima/TextAdventure-CLISoulWorker/contents/version') do set LATEST_VERSION=%%i\n",
-    "set /p CURRENT_VERSION=<version\n",
-    "echo Checking version...\n",
-    "echo Current version is %CURRENT_VERSION%\n",
-    "echo Latest version is %LATEST_VERSION%\n",
-    "if '%LATEST_VERSION%' neq '%CURRENT_VERSION%' (\n",
-    "  exit /b 64\n",
-    ") else (\n",
-    "  exit /b 128\n",
-    ")"
-  };
+// #pragma comment(lib, "wininet.lib")
 
-  versionScript = "check.bat";
-#else
-  scriptLen = 9;
-  char* scriptContents[] = {
-    "#!/bin/bash\n",
-    // "LATEST_VERSION='alpha-3.1.0'\n",
-    "LATEST_VERSION=$(curl -L -H \"Accept: application/vnd.github.raw+json\" https://api.github.com/repos/Mnemos-Parasynthima/TextAdventure-CLISoulWorker/contents/version)\n",
-    "CURRENT_VERSION=$(cat version)\n",
-    "echo 'Checking version...'\n",
-    "if [ $LATEST_VERSION != $CURRENT_VERSION ]; then\n",
-    "  exit 64\n",
-    "else\n",
-    "  exit 128\n",
-    "fi"
-  };
-
-  versionScript = "check.sh";
-#endif
-
-  FILE* tmp = fopen(versionScript, "w");
-  if (!tmp) {
-    printf("Could not create temp check file!\n");
-    exit(BAD_EXIT);
-  }
-
-  for (int i = 0; i < scriptLen; i++) {
-    fwrite(scriptContents[i], sizeof(char), strlen(scriptContents[i]), tmp);
-  }
-
-  fclose(tmp);
-
-  int status, exitStatus;
-
-#ifdef _WIN64
-  status = _spawnlp(_P_WAIT, versionScript, versionScript, NULL);
-
-  if (status == -1) {
-    perror("ERROR");
-    printf("Could not execute version checker!\n");
-    exit(BAD_EXIT);
-  }
-
-  exitStatus = status;
-#else
-  system("chmod +x check.sh");
-
-  pid_t pid = fork();
-  status = 0;
-
-  if (pid == -1) {
-    perror("ERROR");
-    printf("Could not fork!\n");
-    exit(BAD_EXIT);
-  }
-
-  if (!pid) { // child
-    if (execl(versionScript, versionScript, (char*) NULL) == -1) {
-      perror("ERROR");
-      printf("Could not execute version checker!\n");
-      exit(BAD_EXIT);
-    }
-  }
-
-  wait(&status);
-  exitStatus = WEXITSTATUS(status);
-#endif
-
-  int code = exitStatus >> 6; 
-
-  if (code == 1) return false; // versions do not match
-  else if (code == 2) return true; // versions match
-  else {
-    printf("Version checker terminated abnormally!\n");
-    exit(-1);
-  }
+bool checkLatest() {
+  HINTERNET hInternet, hConnect;
+  char buffer[256] = {0};
+  DWORD bytesRead;
   
+  hInternet = InternetOpenA("VersionChecker", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+  if (!hInternet) return -1;
+  
+  hConnect = InternetOpenUrlA(hInternet, "https://api.github.com/repos/Mnemos-Parasynthima/TextAdventure-CLISoulWorker/contents/version",
+      "Accept: application/vnd.github.raw+json\r\n", -1,
+      INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE, 0);
+  
+  if (hConnect) {
+    InternetReadFile(hConnect, buffer, sizeof(buffer) - 1, &bytesRead);
+    buffer[bytesRead] = '\0';
+    InternetCloseHandle(hConnect);
+  }
+  InternetCloseHandle(hInternet);
+  
+  // Read local version
+  FILE* fp = fopen("version", "r");
+  if (!fp) return -1;
+  
+  char localVersion[256] = {0};
+  fgets(localVersion, sizeof(localVersion), fp);
+  fclose(fp);
+  
+  // Trim newlines
+  localVersion[strcspn(localVersion, "\r\n")] = 0;
+  buffer[strcspn(buffer, "\r\n")] = 0;
+  
+  printf("Checking version...\n");
+  printf("Current version is %s\n", localVersion);
+  printf("Latest version is %s\n", buffer);
+  
+  if (strcmp(buffer, localVersion) != 0) return false;
+  return true;
+}
+
+#else
+#include <curl/curl.h>
+
+size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userp) {
+  size_t realsize = size * nmemb;
+  strncat((char*)userp, (char*)contents, realsize);
+  return realsize;
+}
+
+bool checkLatest() {
+  CURL* curl;
+  CURLcode res;
+  char remoteVersion[256] = {0};
+  
+  curl_global_init(CURL_GLOBAL_DEFAULT);
+  curl = curl_easy_init();
+  
+  if (curl) {
+    struct curl_slist* headers = NULL;
+    headers = curl_slist_append(headers, "Accept: application/vnd.github.raw+json");
+    headers = curl_slist_append(headers, "User-Agent: VersionChecker/1.0");
+    
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.github.com/repos/Mnemos-Parasynthima/TextAdventure-CLISoulWorker/contents/version");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);  // Follow redirects
+    curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 5L);       // Max 5 redirects
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, remoteVersion);
+    
+    res = curl_easy_perform(curl);
+    
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+      curl_easy_cleanup(curl);
+      curl_slist_free_all(headers);
+      curl_global_cleanup();
+      return -1;
+    }
+    
+    curl_easy_cleanup(curl);
+    curl_slist_free_all(headers);
+  }
+  curl_global_cleanup();
+  
+  // Read local version
+  FILE* fp = fopen("version", "r");
+  if (!fp) return -1;
+  
+  char localVersion[256] = {0};
+  fgets(localVersion, sizeof(localVersion), fp);
+  fclose(fp);
+  
+  // Trim newlines
+  localVersion[strcspn(localVersion, "\r\n")] = 0;
+  remoteVersion[strcspn(remoteVersion, "\r\n")] = 0;
+  
+  printf("Checking version...\n");
+  printf("Current version is %s\n", localVersion);
+  printf("Latest version is %s\n", remoteVersion);
+  
+  if (strcmp(remoteVersion, localVersion) == 0) return true;
   return false;
 }
+#endif
 
 /**
  * Runs the installer based on the passed options.
