@@ -133,7 +133,7 @@ bool addToInv(SoulWorker* sw, Item* loot) {
           case WEAPON_UPGRADE_MATERIALS_T:
           case ARMOR_UPGRADE_MATERIALS_T:
           case SLIME_T:
-            deleteOther((HPKit*) sw->inv[i]._item);
+            deleteOther(sw->inv[i]._item, sw->inv[i].type);
             break;
           default:
             break;
@@ -175,7 +175,7 @@ void removeFromInv(SoulWorker* sw, Item* item, ushort count) {
       case WEAPON_UPGRADE_MATERIALS_T:
       case ARMOR_UPGRADE_MATERIALS_T:
       case SLIME_T:
-        deleteOther((HPKit*) _item);
+        deleteOther(_item, item->type);
         break;
       default:
         break;
@@ -940,7 +940,7 @@ void deleteSoulWorker(SoulWorker* sw) {
       case WEAPON_UPGRADE_MATERIALS_T:
       case ARMOR_UPGRADE_MATERIALS_T:
       case SLIME_T:
-        deleteOther((HPKit*) _item);
+        deleteOther((void*) _item, sw->inv[i].type);
         break;
       default:
         break;

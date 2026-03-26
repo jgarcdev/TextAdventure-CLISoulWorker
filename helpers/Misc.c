@@ -254,12 +254,27 @@ void deleteArmor(Armor* armor) {
   armor = NULL;
 }
 
-void deleteOther(HPKit* item) {
+void deleteOther(void* item, item_t type) {
   if (!item) return;
 
-  free(item->desc);
+  switch (type) {
+    case HP_KITS_T:
+      HPKit* hpKit = (HPKit*) item;
+      free(hpKit->desc);
+      break;
+    case WEAPON_UPGRADE_MATERIALS_T:
+    case ARMOR_UPGRADE_MATERIALS_T:
+      Upgrade* upgrade = (Upgrade*) item;
+      free(upgrade->desc);
+      break;
+    case SLIME_T:
+      Slime* slime = (Slime*) item;
+      free(slime->desc);
+      break;
+    default:
+      break;
+  }
   free(item);
-  item = NULL;
 }
 
 bool deleteItem(Item* item) {
@@ -280,7 +295,7 @@ bool deleteItem(Item* item) {
     case WEAPON_UPGRADE_MATERIALS_T:
     case ARMOR_UPGRADE_MATERIALS_T:
     case SLIME_T:
-      deleteOther((HPKit*)item->_item);
+      deleteOther(item->_item, item->type);
       break;
     default:
       break;

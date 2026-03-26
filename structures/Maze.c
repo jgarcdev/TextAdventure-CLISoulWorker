@@ -163,7 +163,7 @@ void showMap(Maze* maze, Room* playerRoom) {
 }
 
 void deleteRoom(Room* room) {
-  if (!room->loot) deleteItem(room->loot);
+  deleteItem(room->loot);
   deleteEnemyFromMap(room, true);
   free(room->info);
   if (room->storyFile) free(room->storyFile);

@@ -307,6 +307,7 @@ void loop() {
         if (!mazeFile) endOfGame();
 
         maze = initMaze(mazeFile);
+        free(mazeFile);
 
         player->room = maze->entry;
         currRoom = player->room;
@@ -408,7 +409,10 @@ int main(int argc, char const *argv[]) {
   }
 
   mazeIdx = 0;
-  maze = initMaze(getNextMaze());
+  STR nextMaze = getNextMaze();
+  maze = initMaze(nextMaze);
+  free(nextMaze);
+
 
   printf("What shall the Records name you, birthing %sSoul%s? ", CYAN, RESET);
 
