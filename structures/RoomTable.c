@@ -57,7 +57,7 @@ bool putRoom(Table* table, Room* room, bool overwrite) {
     table->cap += ROOM_MULT;
   }
 
-  byte id = room->id;
+  ubyte id = room->id;
   Room* _room = table->rooms[(int) id];
 
   if (!_room) { // Room does not exist, add it

@@ -36,7 +36,7 @@
 #define ENEMY "enemy"
 #define HAS_BOSS "hasBoss"
 
-const str SAVE_DIR = "./data/saves";
+const STR SAVE_DIR = "./data/saves";
 
 #ifdef __linux__
 // itoa is in assembly (just for fun), change it to C later
@@ -46,7 +46,7 @@ const str SAVE_DIR = "./data/saves";
  * @param buffer The buffer to hold the string
  * @return The integer as a string
  */
-extern str itoa(int n, char* buffer, int radix);
+extern STR itoa(int n, char* buffer, int radix);
 #endif
 
 /**
@@ -55,7 +55,7 @@ extern str itoa(int n, char* buffer, int radix);
  * @param type The JSON object tag
  * @return NULL
  */
-static str createError(cJSON* obj, const str type) {
+static STR createError(cJSON* obj, const STR type) {
   cJSON_Delete(obj);
 
   handleError(ERR_DATA, WARNING, "Could not create JSON for %s!\n", type);
@@ -69,7 +69,7 @@ static str createError(cJSON* obj, const str type) {
  * @param id The target ID
  * @return Room with matching ID
  */
-static Room* findRoom(Room* room, byte id, DArray* visited) {
+static Room* findRoom(Room* room, ubyte id, DArray* visited) {
   if (room != (void*) ((long long) NO_EXIT)) {
     if (room->id == id) return room;
 
@@ -484,7 +484,7 @@ static cJSON* saveEnemy(EnemyU* _enemy, bool hasBoss) {
  * Creates the maze state for saving.
  * @return The maze as a JSON string
  */
-static str createMapState() {
+static STR createMapState() {
   Table* table = initTableL(maze->size);
   if (!table) handleError(ERR_MEM, FATAL, "Could not allocate space for the table!\n");
 
@@ -507,7 +507,7 @@ static str createMapState() {
     // Creating each room
 
     char buffer[2];
-    str idAsChar = itoa(room->id, buffer, 10);
+    STR idAsChar = itoa(room->id, buffer, 10);
 
     cJSON* roomObj = cJSON_AddObjectToObject(mapObj, idAsChar);
     if (!roomObj) return createError(mapObj, idAsChar);
@@ -555,7 +555,7 @@ static str createMapState() {
     }
   }
 
-  str mapState = cJSON_Print(mapObj);
+  STR mapState = cJSON_Print(mapObj);
 
   cJSON_Delete(mapObj);
   deleteTable(table);
@@ -568,7 +568,7 @@ static str createMapState() {
  * @return True if the map was saved, false otherwise
  */
 static bool saveMap() {
-  str mapState = createMapState();
+  STR mapState = createMapState();
   if (!mapState) handleError(ERR_DATA, WARNING, "Could not create map state!\n");
 
   if (mapState) {
@@ -596,7 +596,7 @@ static bool saveMap() {
  * Creates the player state.
  * @return The player state as JSON string
  */
-static str createPlayerState() {
+static STR createPlayerState() {
   cJSON* playerObj = cJSON_CreateObject();
   if (!playerObj) return createError(playerObj, "player");
 
@@ -691,7 +691,7 @@ static str createPlayerState() {
   bool skillTree = saveSkillTree(playerObj, player->skills);
   if (!skillTree) return createError(playerObj, "player skill tree");
 
-  str playerState = cJSON_Print(playerObj);
+  STR playerState = cJSON_Print(playerObj);
 
   cJSON_Delete(playerObj);
   return playerState;
@@ -702,7 +702,7 @@ static str createPlayerState() {
  * @return True if the player was saved, false otherwise
  */
 static bool savePlayer() {
-  str playerState = createPlayerState();
+  STR playerState = createPlayerState();
   if (!playerState) { handleError(ERR_DATA, WARNING, "Could not create player state!\n"); return false; }
   
   char filename[32];
@@ -780,7 +780,7 @@ static SoulWorker* loadPlayer() {
 
 
   int nameLen = strlen(name->valuestring);
-  str playerName = (str) malloc(nameLen + 1);
+  STR playerName = (STR) malloc(nameLen + 1);
   if (!playerName) handleError(ERR_MEM, FATAL, "Could not allocate space for the player name!\n");
   strncpy(playerName, name->valuestring, nameLen+1);
 
@@ -802,7 +802,7 @@ static SoulWorker* loadPlayer() {
   if (!player->room|| player->room == (void*)((long long) NO_EXIT)) handleError(ERR_DATA, FATAL, "Could not find room!\n");
 
   // Make sure room is the same
-  if (player->room->id != (byte)(roomId->valueint)) handleError(ERR_DATA, FATAL, "Room ID does not match!\n");
+  if (player->room->id != (ubyte)(roomId->valueint)) handleError(ERR_DATA, FATAL, "Room ID does not match!\n");
 
 
   for (int i = 0; i < cJSON_GetArraySize(inv); i++) {

@@ -5,6 +5,9 @@
 #include "Keyboard.h"
 #include "Error.h"
 #include "SaveLoad.h"
+#ifdef _WIN64
+  #include "unistd.h"
+#endif
 
 
 #define CHAR_TO_INDEX(c) \
@@ -80,7 +83,7 @@ static bool validExit(Movement dir, Room* room) {
   return true;
 }
 
-static uint getPrice(byte lvl, item_t type) {
+static uint getPrice(ubyte lvl, item_t type) {
   /**
    * Pricing Model
    * Each gear piece has a certain weight relative to each other.
@@ -160,7 +163,7 @@ static void sellItem(Item* item, ushort count) {
   uint total = dz * count;
   player->dzenai += total;
 
-  str itemName = getItemName(item);
+  STR itemName = getItemName(item);
   printf("%d %s has been sold for %d dzenai!\n", count, itemName, total);
 
   if (item->type >= HP_KITS_T && item->type <= ARMOR_UPGRADE_MATERIALS_T) free(itemName);
@@ -168,7 +171,7 @@ static void sellItem(Item* item, ushort count) {
   removeFromInv(player, item, count);
 }
 
-static Item* validItem(byte itemI) {
+static Item* validItem(ubyte itemI) {
   if (itemI < 1 || itemI > INV_CAP) return NULL;
   if (!player->inv[itemI-1]._item) return NULL;
 

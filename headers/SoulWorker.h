@@ -13,7 +13,7 @@
 
 // The player model.
 typedef struct SoulWorker {            // 506B+6B(PAD) = 512B
-  str name; // The name of the player                       8B
+  STR name; // The name of the player                       8B
   Room* room; // The current room that the player is in     8B
   uint xp; // The current XP                                4B
   uint xpReq; // The total required XP for level up         4B
@@ -43,7 +43,7 @@ typedef struct SkillTree {             // 443B+5B(PAD) = 448B
  * @param name The name of the player
  * @return The SoulWorker player model
  */
-SoulWorker* initSoulWorker(str name);
+SoulWorker* initSoulWorker(STR name);
 
 /**
  * Adds a given loot item to a player.

@@ -12,7 +12,7 @@
 static SkillTree* initSkillTree();
 static uint xpRequired(uint lvl);
 
-SoulWorker* initSoulWorker(str name) {
+SoulWorker* initSoulWorker(STR name) {
   SoulWorker* sw = (SoulWorker*) malloc(sizeof(SoulWorker));
   if (!sw) handleError(ERR_MEM, FATAL, "Could not allocate space for the player!\n");  
 
@@ -196,7 +196,7 @@ void viewInventory(SoulWorker* sw) {
 
     for (int i = 0; i < INV_CAP; i++) {
       if (sw->inv[i]._item != NO_ITEM) {
-        str name = getItemName(&(sw->inv[i]));
+        STR name = getItemName(&(sw->inv[i]));
 
         printf("%d: %s * %d\n", i+1, name, sw->inv[i].count);
 
@@ -242,12 +242,12 @@ static void viewGear(SoulWorker* sw) {
   // If no gear piece equipped, only get space for "Unequipped\0"
   // Otherwise, space for name and its stats
   //                                                            [name] + rest + [lvl] + [acc] + [def] + \0
-  helmetStats = (str) malloc((helmet == NO_ITEM) ? 11 : (helmetNameLen + 21 + 3 + 5 + 3 + 1));
-  shoulderGuardStats = (str) malloc((guard == NO_ITEM) ? 11 : (shoulderGuardNameLen + 21 + 3 + 5 + 3 + 1));
-  chestplateStats = (str) malloc((chestplate == NO_ITEM) ? 11 : (chestplateNameLen + 21 + 3 + 5 + 3 + 1));
-  bootsStats = (str) malloc((boots == NO_ITEM) ? 11 : (bootsNameLen + 21 + 3 + 5 + 3 + 1));
+  helmetStats = (STR) malloc((helmet == NO_ITEM) ? 11 : (helmetNameLen + 21 + 3 + 5 + 3 + 1));
+  shoulderGuardStats = (STR) malloc((guard == NO_ITEM) ? 11 : (shoulderGuardNameLen + 21 + 3 + 5 + 3 + 1));
+  chestplateStats = (STR) malloc((chestplate == NO_ITEM) ? 11 : (chestplateNameLen + 21 + 3 + 5 + 3 + 1));
+  bootsStats = (STR) malloc((boots == NO_ITEM) ? 11 : (bootsNameLen + 21 + 3 + 5 + 3 + 1));
 
-  weaponStats = (str) malloc((swp == NO_ITEM) ? 11 : (weaponNameLen + 75 + 5 + 5 + 6 + 5 + 3 + 3 + 3 + 1));
+  weaponStats = (STR) malloc((swp == NO_ITEM) ? 11 : (weaponNameLen + 75 + 5 + 5 + 6 + 5 + 3 + 3 + 3 + 1));
   // atk_crit: ###.##
 
   if (swp == NO_ITEM) sprintf(weaponStats, "Unequipped");
@@ -318,8 +318,8 @@ void viewSelf(SoulWorker* sw) {
  * @param COL_WIDTH Width of a column
  */
 void skillRow(SkillTree* skillTree, int start, int end, int COL_WIDTH) {
-  const str UNLOCKED = GREEN;
-  const str LOCKED = RED;
+  const STR UNLOCKED = GREEN;
+  const STR LOCKED = RED;
 
 // Print slot/id
   for (int i = start; i < end; i++) {
@@ -340,7 +340,7 @@ void skillRow(SkillTree* skillTree, int start, int end, int COL_WIDTH) {
   printf("|\n");
 
 
-  str activeEffect;
+  STR activeEffect;
   effect_t _activeEffect;
   ushort effect;
   float effectF;
@@ -454,7 +454,7 @@ void viewSkill(Skill* skill) {
 
   printf("| %s, LVL %-*d|\n", skill->name, COL_WIDTH / 2, skill->lvl);
 
-  str activeEffect;
+  STR activeEffect;
   effect_t _activeEffect;
   ushort effect;
   float effectF;
@@ -823,11 +823,11 @@ static SkillTree* initSkillTree() {
   FILE* skillsFile = fopen(SKILL_DATA, "r");
   if (!skillsFile) handleError(ERR_IO, FATAL, "Could not open skills data!\n");
 
-  str buffer = (str) malloc(SIZE);
+  STR buffer = (STR) malloc(SIZE);
   if (!buffer) handleError(ERR_MEM, FATAL, "Could not allocate space for skills buffer!\n");
 
-  str name = NULL, *description = NULL;
-  byte lvl, cooldown, id;
+  STR name = NULL, *description = NULL;
+  ubyte lvl, cooldown, id;
   ushort effect1;
   float effect2;
   effect_t activeEffect1, activeEffect2;
@@ -857,15 +857,15 @@ static SkillTree* initSkillTree() {
     // printf("description: %s\n", description);
 
     fgets(buffer, 5, skillsFile);
-    lvl = (byte) atoi(buffer);
+    lvl = (ubyte) atoi(buffer);
     // printf("lvl: %d\n", lvl);
 
     fgets(buffer, 5, skillsFile);
-    cooldown = (byte) atoi(buffer);
+    cooldown = (ubyte) atoi(buffer);
     // printf("cooldown: %d\n", cooldown);
 
     fgets(buffer, 5, skillsFile);
-    id = (byte) atoi(buffer);
+    id = (ubyte) atoi(buffer);
     // printf("id: %d\n", id);
 
     fgets(buffer, 7, skillsFile);

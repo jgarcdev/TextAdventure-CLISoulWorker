@@ -5,11 +5,11 @@
 #include "Error.h"
 #include "Colors.h"
 
-#define str char*
+#define STR char*
 
 static char buffer[150]; // Maybe increase size depending on future error text
 
-static str errnames[ERR_IO+1] = {
+static STR errnames[ERR_IO+1] = {
   "DATA FORMAT ERROR",
   "MEMORY ERROR",
   "IO ERROR"
@@ -20,11 +20,11 @@ static str errnames[ERR_IO+1] = {
  * @param fmsg The format string
  * @param args The variable arguments
  */
-static void formatMessage(const str fmsg, va_list args) {
+static void formatMessage(const STR fmsg, va_list args) {
   vsnprintf(buffer, 150, fmsg, args);
 }
 
-void handleError(errType err, sevType sev, const str fmsg, ...) {
+void handleError(errType err, sevType sev, const STR fmsg, ...) {
   va_list args;
   va_start(args, fmsg);
 

@@ -107,12 +107,12 @@ bool equalItems(Item* item1, Item* item2) {
  * @param hpKit The HP kit to get the name
  * @return The name
  */
-static str getHPKitName(HPKit* hpKit) {
+static STR getHPKitName(HPKit* hpKit) {
   // "**** HP Kit"
-  str name = (str) malloc(12);
+  STR name = (STR) malloc(12);
   if (!name) handleError(ERR_MEM, FATAL, "Could not allocate space for HP Kit name!\n");
 
-  str type;
+  STR type;
   switch (hpKit->type) {
     case DEKA:
       type = "Deka";
@@ -138,12 +138,12 @@ static str getHPKitName(HPKit* hpKit) {
  * @param upgrade The upgrade material
  * @return The name
  */
-static str getUpgradeName(Upgrade* upgrade) {
+static STR getUpgradeName(Upgrade* upgrade) {
   // "* Weapon|Armor Upgrade Material"  
-  str name = (str) malloc(26);
+  STR name = (STR) malloc(26);
   if (!name) handleError(ERR_MEM, FATAL, "Could not allocate space for upgrade material name!\n");
 
-  str type;
+  STR type;
   switch (upgrade->type) {
     case WEAPON:
       type = "Weapon";
@@ -161,8 +161,8 @@ static str getUpgradeName(Upgrade* upgrade) {
   return name;
 }
 
-str getItemName(Item* item) {
-  str name;
+STR getItemName(Item* item) {
+  STR name;
 
   switch (item->type) {
     case SOULWEAPON_T:
@@ -215,7 +215,7 @@ void displaySoulWeapon(SoulWeapon* sw) {
 }
 
 void displayArmor(Armor* armor) {
-  str type;
+  STR type;
 
   if (armor->type == HELMET) type = "Helmet";
   else if (armor->type == SHOULDER_GUARD) type = "Shoulder Guard";
@@ -298,8 +298,8 @@ void displayEnemyStats(Enemy* enemy) {
       enemy->stats->ATK, enemy->stats->DEF, enemy->stats->ACC, enemy->stats->ATK_CRIT_DMG, enemy->stats->ATK_CRIT);
 }
 
-void initSkill(Skill *skill, str name, str desc, byte lvl, byte cooldown, 
-    ushort effect1, float effect2, effect_t active1, effect_t active2, byte id) {
+void initSkill(Skill *skill, STR name, STR desc, ubyte lvl, ubyte cooldown, 
+    ushort effect1, float effect2, effect_t active1, effect_t active2, ubyte id) {
   skill->name = name;
   skill->description = desc;
   skill->lvl = lvl;

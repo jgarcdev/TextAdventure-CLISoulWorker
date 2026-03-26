@@ -11,12 +11,8 @@
 #define uchar unsigned char
 #define uint unsigned int
 
-#ifndef _STR_
-#define str char*
-#endif
-#ifndef _BYTE_
-#define byte unsigned char
-#endif
+#define STR char*
+#define ubyte unsigned char
 
 
 typedef struct Stats {                         // 12B
@@ -52,14 +48,14 @@ typedef struct Item {      // 14B+2B(PAD) = 16B
 // 
 
 typedef struct SoulWeapon {      // 21B+3B(PAD) = 24B
-  str name; // The name of the weapon              8B
+  STR name; // The name of the weapon              8B
   ushort atk; // The attack stat                   2B
   ushort acc; // The accuracy stat                 2B
   float atk_crit; // The attack crit percent       4B
   ushort atk_crit_dmg; // The attack crit damage   2B
-  byte lvl; // The weapon level                    1B
-  byte upgrades; // Upgrades done                  1B
-  byte durability; // Weapon durability            1B
+  ubyte lvl; // The weapon level                    1B
+  ubyte upgrades; // Upgrades done                  1B
+  ubyte durability; // Weapon durability            1B
 } SoulWeapon;
 
 typedef enum {
@@ -69,11 +65,11 @@ typedef enum {
   BOOTS
 } armor_t;
 typedef struct Armor { //                16B
-  str name; // The armor name             8B
+  STR name; // The armor name             8B
   armor_t type; // The type of armor      4B
   ushort acc; // The accuracy it provides 2B
-  byte def; // The defense stat           1B
-  byte lvl; // The armor level            1B
+  ubyte def; // The defense stat           1B
+  ubyte lvl; // The armor level            1B
 } Armor;
 
 typedef enum {
@@ -121,7 +117,7 @@ bool equalItems(Item* item1, Item* item2);
  * @param item The item
  * @return The name
  */
-str getItemName(Item* item);
+STR getItemName(Item* item);
 
 
 /**
@@ -203,12 +199,12 @@ typedef enum {
 } effect_t;
 
 typedef struct Skill { // 34B+6B(PAD) = 40B
-  str name; //                           8B
-  str description; //                    8B
-  byte lvl; //                           1B
-  byte cooldown; //                      1B
+  STR name; //                           8B
+  STR description; //                    8B
+  ubyte lvl; //                           1B
+  ubyte cooldown; //                      1B
   char cdTimer; //                       1B
-  byte id; //                            1B
+  ubyte id; //                            1B
   union { //                             2B
     ushort atk; // 2B
     ushort atk_crit_dmg; // 2B
@@ -223,10 +219,10 @@ typedef struct Skill { // 34B+6B(PAD) = 40B
 } Skill;
 
 typedef struct Enemy { // 25B+7B(PAD) = 32B
-  str name; //                           8B
+  STR name; //                           8B
   uint xpPoints; //                      4B
   uint hp; //                            4B
-  uchar lvl; //                          1B
+  ubyte lvl; //                          1B
   Stats* stats; //                       8B
 } Enemy;
 
@@ -259,8 +255,8 @@ void displayEnemyStats(Enemy* enemy);
  * @param active1 
  * @param active2 
  */
-void initSkill(Skill* skill, str name, str desc, byte lvl, byte cooldown, 
-    ushort effect1, float effect2, effect_t active1, effect_t active2, byte id);
+void initSkill(Skill* skill, STR name, STR desc, ubyte lvl, ubyte cooldown, 
+    ushort effect1, float effect2, effect_t active1, effect_t active2, ubyte id);
 
 /**
  * Deletes the skills' name and description

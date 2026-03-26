@@ -16,7 +16,7 @@
  * @param filename The map to initiate
  * @return The Maze structure
  */
-Maze* initMaze(const str filename);
+Maze* initMaze(const STR filename);
 
 /**
  * Creates a SoulWeapon with the given cJSON data.

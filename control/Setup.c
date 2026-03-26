@@ -9,7 +9,7 @@
 #define MAPS_DIR "./data/maps";
 
 
-str readJSON(const str filename) {
+STR readJSON(const STR filename) {
   FILE* file = fopen(filename, "r");
 
   if (!file) handleError(ERR_IO, FATAL, "Could not open file!\n");
@@ -18,7 +18,7 @@ str readJSON(const str filename) {
   long len = ftell(file);
   rewind(file);
 
-  str buff = (str) malloc(len + 1);
+  STR buff = (STR) malloc(len + 1);
   if (!buff) handleError(ERR_MEM, FATAL, "Could not allocate memory for buffer!\n");
 
   fread(buff, 1, len, file);
@@ -30,15 +30,15 @@ str readJSON(const str filename) {
   return buff;
 }
 
-cJSON* readData(const str filename) {
-  str buffer = readJSON(filename);
+cJSON* readData(const STR filename) {
+  STR buffer = readJSON(filename);
 
   cJSON* json = cJSON_Parse(buffer);
   
   free(buffer);
 
   if (!json) {
-    const str err = cJSON_GetErrorPtr();
+    const STR err = cJSON_GetErrorPtr();
 
     if (err) fprintf(stderr, "Parsing error: %s\n", err);
 
@@ -56,7 +56,7 @@ cJSON* readData(const str filename) {
  * @param room The cJSON structure to validate
  */
 static void validateRoom(cJSON* room) {
-  const str dataErr = "Room %d: No %s data found!\n";
+  const STR dataErr = "Room %d: No %s data found!\n";
 
   char roomId = (char) atoi(room->string);
 
@@ -144,14 +144,14 @@ static void validateRoom(cJSON* room) {
 }
 
 SoulWeapon* createSoulWeapon(cJSON* obj) {
-  const str errMsg = "Could not find data for SoulWeapon %s!\n";
+  const STR errMsg = "Could not find data for SoulWeapon %s!\n";
 
   SoulWeapon* sw = (SoulWeapon*) malloc(sizeof(SoulWeapon));
   if (!sw) handleError(ERR_MEM, FATAL, "Could not allocate space for SoulWeapon!\n");
 
   cJSON* name = cJSON_GetObjectItemCaseSensitive(obj, "name");
   if (!name) handleError(ERR_DATA, FATAL, errMsg, "name");
-  sw->name = (str) malloc(strlen(name->valuestring) + 1);
+  sw->name = (STR) malloc(strlen(name->valuestring) + 1);
   if (!sw->name) handleError(ERR_MEM, FATAL, "Could not allocate space for SoulWeapon name!\n");
   strcpy(sw->name, name->valuestring);
 
@@ -187,14 +187,14 @@ SoulWeapon* createSoulWeapon(cJSON* obj) {
 }
 
 Armor* createArmor(cJSON* obj) {
-  const str errMsg = "Could not find data for armor %s!\n";
+  const STR errMsg = "Could not find data for armor %s!\n";
 
   Armor* armor = (Armor*) malloc(sizeof(Armor));
   if (!armor) handleError(ERR_MEM, FATAL, "Could not allocate space for armor!\n");
 
   cJSON* name = cJSON_GetObjectItemCaseSensitive(obj, "name");
   if (!name) handleError(ERR_DATA, FATAL, errMsg, "name");
-  armor->name = (str) malloc(strlen(name->valuestring) + 1);
+  armor->name = (STR) malloc(strlen(name->valuestring) + 1);
   if (!armor->name) handleError(ERR_MEM, FATAL, "Could not allocate space for armor name!\n");
   strcpy(armor->name, name->valuestring);
 
@@ -227,7 +227,7 @@ HPKit* createHPKit(cJSON* obj) {
 
   cJSON* desc = cJSON_GetObjectItemCaseSensitive(obj, "description");
   if (!desc) handleError(ERR_DATA, FATAL, "Could not find data for HP Kit description!\n");
-  hpKit->desc = (str) malloc(strlen(desc->valuestring) + 1);
+  hpKit->desc = (STR) malloc(strlen(desc->valuestring) + 1);
   if (!hpKit->desc) handleError(ERR_MEM, FATAL, "Could not allocate space for HP Kit description!\n");
   strcpy(hpKit->desc, desc->valuestring);
 
@@ -248,7 +248,7 @@ Upgrade* createUpgrade(cJSON* obj) {
 
   cJSON* desc = cJSON_GetObjectItemCaseSensitive(obj, "description");
   if (!desc) handleError(ERR_DATA, FATAL, "Could not find data for upgrade description!\n");
-  upgrade->desc = (str) malloc(strlen(desc->valuestring) + 1);
+  upgrade->desc = (STR) malloc(strlen(desc->valuestring) + 1);
   if (!upgrade->desc) handleError(ERR_MEM, FATAL, "Could not allocate space for upgrade description!\n");
   strcpy(upgrade->desc, desc->valuestring);
 
@@ -261,7 +261,7 @@ Slime* createSlime(cJSON* obj) {
 
   cJSON* desc = cJSON_GetObjectItemCaseSensitive(obj, "description");
   if (!desc) handleError(ERR_DATA, FATAL, "Could not find data for slime description!\n");
-  slime->desc = (str) malloc(strlen(desc->valuestring) + 1);
+  slime->desc = (STR) malloc(strlen(desc->valuestring) + 1);
   if (!slime->desc) handleError(ERR_MEM, FATAL, "Could not allocate space for slime description!\n");
   strcpy(slime->desc, desc->valuestring);
 
@@ -314,13 +314,13 @@ Skill* createSkill(cJSON* obj) {
 
   cJSON* name = cJSON_GetObjectItemCaseSensitive(obj, "name");
   if (!name) handleError(ERR_DATA, FATAL, "Could not find data for skill name!\n");
-  skill->name = (str) malloc(strlen(name->valuestring) + 1);
+  skill->name = (STR) malloc(strlen(name->valuestring) + 1);
   if (!skill->name) handleError(ERR_MEM, FATAL, "Could not allocate space for skill name!\n");
   strcpy(skill->name, name->valuestring);
 
   cJSON* desc = cJSON_GetObjectItemCaseSensitive(obj, "description");
   if (!desc) handleError(ERR_DATA, FATAL, "Could not find data for skill description!\n");
-  skill->description = (str) malloc(strlen(desc->valuestring) + 1);
+  skill->description = (STR) malloc(strlen(desc->valuestring) + 1);
   if (!skill->description) handleError(ERR_MEM, FATAL, "Could not allocate space for skill description!\n");
   strcpy(skill->description, desc->valuestring);
 
@@ -426,14 +426,14 @@ static Item* selectLoot(cJSON* table) {
 }
 
 static Enemy* initEnemy(cJSON* obj) {
-  const str errMsg = "Could not find data for enemy %s!\n";
+  const STR errMsg = "Could not find data for enemy %s!\n";
 
   Enemy* enemy = (Enemy*) malloc(sizeof(Enemy));
   if (!enemy) handleError(ERR_MEM, FATAL, "Could not allocate space for enemy!\n");
 
   cJSON* name = cJSON_GetObjectItemCaseSensitive(obj, "name");
   if (!name) handleError(ERR_DATA, FATAL, errMsg, "name");
-  enemy->name = (str) malloc(strlen(name->valuestring) + 1);
+  enemy->name = (STR) malloc(strlen(name->valuestring) + 1);
   if (!enemy->name) handleError(ERR_MEM, FATAL, "Could not allocate space for enemy name!\n");
   strcpy(enemy->name, name->valuestring);
 
@@ -479,14 +479,14 @@ static Enemy* initEnemy(cJSON* obj) {
 }
 
 static Boss* initBoss(cJSON* obj) {
-  const str errMsg = "Could not find data for boss %s!\n";
+  const STR errMsg = "Could not find data for boss %s!\n";
 
   Boss* boss = (Boss*) malloc(sizeof(Boss));
   if (!boss) handleError(ERR_MEM, FATAL, "Could not allocate space for boss!\n");
 
   cJSON* name = cJSON_GetObjectItemCaseSensitive(obj, "name");
   if (!name) handleError(ERR_DATA, FATAL, errMsg, "name");
-  boss->base.name = (str) malloc(strlen(name->valuestring) + 1);
+  boss->base.name = (STR) malloc(strlen(name->valuestring) + 1);
   if (!boss->base.name) handleError(ERR_MEM, FATAL, "Could not allocate space for boss name!\n");
   strcpy(boss->base.name, name->valuestring);
 
@@ -630,19 +630,19 @@ static Room* createRoom(cJSON* _room) {
   if (!enemyTable) handleError(ERR_DATA, FATAL, "Could not get room enemies!\n");
 
 
-  room->id = (byte) atoi(_room->string);
+  room->id = (ubyte) atoi(_room->string);
 
   room->hasBoss = (bool) hasBoss->valueint;
 
   // A room w/o storyfile stores an empty string
   size_t storyfileLen = strlen(storyfile->valuestring);
   if (storyfileLen != 0) {
-    room->storyFile = (str) malloc(sizeof(char) * storyfileLen + 1);
+    room->storyFile = (STR) malloc(sizeof(char) * storyfileLen + 1);
     if (!room->storyFile) handleError(ERR_MEM, FATAL, "Could not allocate space for room storyfile!\n");
     strcpy(room->storyFile, storyfile->valuestring);
   } else room->storyFile = NULL;
 
-  room->info = (str) malloc(sizeof(char) * strlen(info->valuestring) + 1);
+  room->info = (STR) malloc(sizeof(char) * strlen(info->valuestring) + 1);
   if (!room->info) handleError(ERR_MEM, FATAL, "Could not allocate space for room info!\n");
   strcpy(room->info, info->valuestring);
 
@@ -699,7 +699,7 @@ Room* connectRooms(Table* table) {
   return entry;
 }
 
-Maze* initMaze(const str filename) {
+Maze* initMaze(const STR filename) {
   cJSON* root = readData(filename);
   if (!root) handleError(ERR_DATA, FATAL, "Could not parse JSON!\n");
 
@@ -746,7 +746,7 @@ Maze* initMaze(const str filename) {
 
   maze->entry = entry;
   maze->size = mazeSize;
-  maze->name = (str) malloc(strlen(mazeName->valuestring) + 1);
+  maze->name = (STR) malloc(strlen(mazeName->valuestring) + 1);
   if (!maze->name) handleError(ERR_MEM, FATAL, "Could not allocate space for the maze name!\n");
   strcpy(maze->name, mazeName->valuestring);
 

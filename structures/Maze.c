@@ -46,17 +46,17 @@ bool deleteEnemyFromMap(Room* room, bool deleteGear) {
  * Prints the cleaned-up version of the maze name
  * @param name The maze name to print
  */
-static void printMazeName(str name) {
+static void printMazeName(STR name) {
   int nameLen = strlen(name);
 
-  str _name = (str) malloc(nameLen + 1);
+  STR _name = (STR) malloc(nameLen + 1);
   if (!_name) {
     handleError(ERR_MEM, WARNING, "Could not allocate space for map name display! Defaulting to maze name.\n"); 
     _name = name;
   } else {
     strcpy(_name, name);
 
-    str temp = _name;
+    STR temp = _name;
 
     // First non-null character will always get capitalized
     if (*temp != '\0') *temp = toupper(*temp);

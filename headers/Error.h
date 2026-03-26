@@ -2,9 +2,7 @@
 #define _ERROR_H
 
 
-#ifndef _STR_
-#define str char*
-#endif
+#define STR char*
 
 // The type of error encountered
 typedef enum {
@@ -25,7 +23,7 @@ typedef enum {
  * @param sev The severity of the error
  * @param fmsg The message to print
  */
-void handleError(errType err, sevType sev, const str fmsg, ...);
+void handleError(errType err, sevType sev, const STR fmsg, ...);
 
 
 #endif

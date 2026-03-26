@@ -75,7 +75,7 @@ static bool checkLatest() {
   char* scriptContents[] = {
     "@echo off\n",
     // "set LATEST_VERSION=alpha-3.1.0\n",
-    "for /f "tokens=*" %%i in ('curl -L -H \"Accept: application/vnd.github.raw+json\" https://api.github.com/repos/Mnemos-Parasynthima/TextAdventure-CLISoulWorker/contents/version') do set LATEST_VERSION=%%i",
+    "for /f \"tokens=*\" %%i in ('curl -L -H \"Accept: application/vnd.github.raw+json\" https://api.github.com/repos/Mnemos-Parasynthima/TextAdventure-CLISoulWorker/contents/version') do set LATEST_VERSION=%%i",
     "set /p CURRENT_VERSION=<version\n",
     "echo Checking version...\n",
     "echo Current version is %CURRENT_VERSION%\n",

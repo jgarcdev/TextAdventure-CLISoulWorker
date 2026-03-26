@@ -9,14 +9,14 @@
  * @param filename The json file to parse
  * @return The root cJSON structure
  */
-cJSON* readData(const str filename);
+cJSON* readData(const STR filename);
 
 /**
  * Reads in the map json file as raw.
  * @param filename The json file
  * @return The raw json text
  */
-char* readJSON(const str filename);
+char* readJSON(const STR filename);
 
 
 #endif

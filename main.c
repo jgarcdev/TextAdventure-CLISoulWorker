@@ -19,7 +19,7 @@ Maze* maze;
 #define NUM_MAZES 2
 int mazeIdx; // The index indicating the current maze name from mazes
 // The array of the names of all possible mazes
-str mazes[NUM_MAZES] = {
+STR mazes[NUM_MAZES] = {
   "control_zone",
   "r_square"
 };
@@ -157,20 +157,20 @@ static bool detectSave() {
  * @param room 
  */
 static void story(bool room) {
-  str base = "./data/story";
-  str filename = NULL;
+  STR base = "./data/story";
+  STR filename = NULL;
 
   // If the story to be printed is for a room
   if (room) {
     size_t mazeNameLen = strlen(maze->name);
     size_t roomStoryLen = strlen(player->room->storyFile);
 
-    filename = (str) malloc(14 + mazeNameLen + roomStoryLen + 1);
+    filename = (STR) malloc(14 + mazeNameLen + roomStoryLen + 1);
     if (!filename) handleError(ERR_MEM, FATAL, "Could not allocate space for filename!\n");
 
     sprintf(filename, "%s/%s/%s", base, maze->name, player->room->storyFile);
   } else { // The story is the introduction story
-    filename = (str) malloc(25);
+    filename = (STR) malloc(25);
     if (!filename) handleError(ERR_MEM, FATAL, "Could not allocate space for filename!\n");
 
     sprintf(filename, "%s/intro.story", base);
@@ -182,7 +182,7 @@ static void story(bool room) {
 
   if (room) player->room->file = story;
 
-  str line = NULL;
+  STR line = NULL;
   size_t n = 0;
 
   printf("\n");
@@ -209,15 +209,15 @@ static void story(bool room) {
  * Gets the next maze to load up, or null if no more
  * @return Next maze
  */
-static str getNextMaze() {
-  str nextMaze = NULL;
+static STR getNextMaze() {
+  STR nextMaze = NULL;
 
   // Out of bounds, as in no more mazes
   if (mazeIdx >= NUM_MAZES) return nextMaze;
 
-  str maze = mazes[mazeIdx];
+  STR maze = mazes[mazeIdx];
 
-  nextMaze = (str) malloc(18 + strlen(maze));
+  nextMaze = (STR) malloc(18 + strlen(maze));
   if (!nextMaze) handleError(ERR_MEM, FATAL, "Could not allocate space for maze name when loading new!\n");
 
   sprintf(nextMaze, "./data/maps/%s.json", maze);
@@ -282,7 +282,7 @@ void loop() {
         // Can just do the printing
         // Assuming the pointer to text is past FIGHT
 
-        str line = NULL;
+        STR line = NULL;
         size_t n = 0;
 
         printf("\n");
@@ -302,7 +302,7 @@ void loop() {
         deleteMaze(maze);
 
         mazeIdx++;
-        str mazeFile = getNextMaze();
+        STR mazeFile = getNextMaze();
 
         if (!mazeFile) endOfGame();
 
@@ -316,7 +316,7 @@ void loop() {
     }
 
     if (currRoom->loot != NULL) {
-      str name = getItemName(currRoom->loot);
+      STR name = getItemName(currRoom->loot);
       printf("You found %d * %s!\n", currRoom->loot->count, name);
       bool added = addToInv(player, currRoom->loot);
 
@@ -377,10 +377,10 @@ int main(int argc, char const *argv[]) {
 
     // char buff[5];
     // fgets(buff, sizeof(buff), stdin);
-    str buff = (str) malloc(5); // max is 3 for "yes", plus newline, plus null
+    STR buff = (STR) malloc(5); // max is 3 for "yes", plus newline, plus null
     fgets(buff, 5, stdin);
 
-    str in = buff; // better name
+    STR in = buff; // better name
     for(;*buff != '\0';buff++) *buff = tolower(*buff);
 
     if (strncmp(in, "yes", 3) == 0) {
@@ -412,7 +412,7 @@ int main(int argc, char const *argv[]) {
 
   printf("What shall the Records name you, birthing %sSoul%s? ", CYAN, RESET);
 
-  str name = NULL;
+  STR name = NULL;
   size_t n = 0;
   ssize_t nameLen = getline(&name, &n, stdin);
   *(name + nameLen - 1) = '\0';

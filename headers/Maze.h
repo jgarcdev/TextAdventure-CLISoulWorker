@@ -16,21 +16,21 @@ typedef union EnemyU {
 // A structure representing a room within a maze. Has connections to other possible rooms.
 typedef struct Room {                                       // 74B+6B(PAD) = 80B
   struct Room* exits[4]; // The possible exits that a room can have          32B
-  str info; // The description of the room.                                   8B
-  str storyFile; // The name of the story text file.                          8B
+  STR info; // The description of the room.                                   8B
+  STR storyFile; // The name of the story text file.                          8B
   FILE* file; // The file for the story text file.                            8B
   // At initialization, the pointers will be the room ids in hex (-1 -> 0xFEEDFAED; 0 -> 0x0; 1 -> 0x1; ...; 10 -> 0xa; etc..)
   EnemyU enemy; // The possible enemy that the room can have                  8B
   Item* loot;// The possible loot item that the room can have                 8B
   bool hasBoss; // Whether the room holds a normal enemy or a boss            1B
-  byte id; // The room id, note: it is not a string, just a number of 1 byte  1B
+  ubyte id; // The room id, note: it is not a string, just a number of 1 byte  1B
 } Room;
 
 // A structure representing a single maze with an entry.
 typedef struct Maze {                     // 17B+7B(PAD) = 24B
   char* name; // The name of the maze/directory for story   8B
   Room* entry; // The entrance of the maze                  8B  
-  byte size; // The number of rooms that the maze has       1B
+  ubyte size; // The number of rooms that the maze has       1B
 } Maze;
 
 // A temporary hashtable to store the rooms for saving, loading, and deleting
