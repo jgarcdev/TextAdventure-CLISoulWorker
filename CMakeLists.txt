@@ -132,6 +132,7 @@ target_link_libraries(clisw-launcher PRIVATE
   "${SDK_LIB_UM}/Uuid.Lib"
   "${SDK_LIB_UM}/User32.Lib"
   "${SDK_LIB_UM}/kernel32.lib"
+  "${SDK_LIB_UM}/wininet.lib"
 )
 add_dependencies(clisw-launcher compile_resources)
 

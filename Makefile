@@ -35,7 +35,7 @@ debug: CFLAGS += -g -O0
 debug: $(TARGET)
 
 launcher:
-	$(CC) $(CFLAGS) launcher.c -o $(LAUNCHER)
+	$(CC) $(CFLAGS) launcher.c -o $(LAUNCHER) -lcurl
 
 installer:
 	$(CC) $(CFLAGS) installer.c -o $(INSTALLER)
