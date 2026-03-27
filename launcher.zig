@@ -47,7 +47,7 @@ fn trimNewline(s: []u8) []u8 {
 }
 
 fn checkLatest(allocator: std.mem.Allocator) !bool {
-	const url = "https://raw.githubusercontent.com/Mnemos-Parasynthima/TextAdventure-CLISoulWorker/main/version";
+	const url = "https://raw.githubusercontent.com/jgarcdev/TextAdventure-CLISoulWorker/main/version";
 
 	var client = std.http.Client{ .allocator = allocator };
 	defer client.deinit();
