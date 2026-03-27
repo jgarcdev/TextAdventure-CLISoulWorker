@@ -47,14 +47,14 @@ fn trimNewline(s: []u8) []u8 {
 }
 
 fn checkLatest(allocator: std.mem.Allocator) !bool {
-	const url = "https://api.github.com/repos/Mnemos-Parasynthima/TextAdventure-CLISoulWorker/contents/version";
+	const url = "https://raw.githubusercontent.com/Mnemos-Parasynthima/TextAdventure-CLISoulWorker/main/version";
 
 	var client = std.http.Client{ .allocator = allocator };
 	defer client.deinit();
 
 	const uri = try std.Uri.parse(url);
 
-	var resBuffer: [32]u8 = undefined;
+	var resBuffer: [64]u8 = undefined;
 	var responseWriter = std.io.Writer.fixed(&resBuffer);
 
 
@@ -62,19 +62,21 @@ fn checkLatest(allocator: std.mem.Allocator) !bool {
 		.location = .{ .uri = uri },
 		.redirect_behavior = .init(1),
 		.response_writer = &responseWriter,
+		.method = .GET,
 		.headers = .{
 			.user_agent = .{ .override = "VersionChecker/1.0" },
-			.content_type = .{ .override = "application/vnd.github.raw+json" }
 		}
 	}) catch |err| {
 		// std.debug.print("HTTP request failed: {}\n", .{err});
 		try stderr.print("HTTP request failed: {}\n", .{err});
+		try stderr.flush();
 		return true;
 	};
 
 	if (res.status != .ok) {
 		// std.debug.print("HTTP request returned non-OK status: {}\n", .{res.status});
 		try stderr.print("HTTP request returned non-OK status: {}\n", .{res.status});
+		try stderr.flush();
 		return true;
 	}
 	const body = trimNewline(resBuffer[0..responseWriter.end]);
@@ -85,6 +87,7 @@ fn checkLatest(allocator: std.mem.Allocator) !bool {
 	const localFile = std.fs.cwd().openFile("version", .{ .mode = .read_only }) catch |err| {
 		// std.debug.print("Could not open local version file: {}\n", .{err});
 		try stderr.print("Could not open local version file: {}\n", .{err});
+		try stderr.flush();
 		return true;
 	};
 	defer localFile.close();
@@ -92,14 +95,16 @@ fn checkLatest(allocator: std.mem.Allocator) !bool {
 
 	var localBuf: [32]u8 = undefined;
 	const readBytes = localFile.read(&localBuf) catch |err| {
-		// std.debug.print("Could not read local version file: {}\n", .{err});
+		std.debug.print("Could not read local version file: {}\n", .{err});
 		try stderr.print("Could not read local version file: {}\n", .{err});
+		try stderr.flush();
 		return true;
 	};
 
 	const local = trimNewline(localBuf[0..readBytes]);
 
 	try stdout.print("Checking version...\nCurrent version is {s}\nLatest version is {s}\n", .{local, body});
+	try stdout.flush();
 
 	return std.mem.eql(u8, body, local);
 }
@@ -133,10 +138,12 @@ fn runInstaller(allocator: std.mem.Allocator, opt: Opt) !void {
 
 	const exitCode = proc.wait() catch |err| {
 		try stdout.print("Could not execute installer: {}\n", .{err});
+		try stdout.flush();
 		std.process.exit(BAD_EXIT);
 	};
 	if (exitCode.Exited != 0) {
 		try stderr.print("Installer exited with code {}\n", .{exitCode});
+		try stderr.flush();
 		std.process.exit(BAD_EXIT);
 	}
 	std.process.exit(0);
@@ -152,6 +159,7 @@ pub fn main() !void {
 	const vf = fs.openFile("version", .{ .mode = .read_only }) catch {
 		// std.debug.print("Could not find version file! Fixing files...\n", .{});
 		try stderr.print("Could not find version file! Fixing files...\n", .{});
+		try stderr.flush();
 		runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
 		return;
 	};
@@ -166,6 +174,7 @@ pub fn main() !void {
 		const stdin = &r.interface;
 
 		try stdout.print("New version found! Do you want to update? [y|n] \n", .{});
+		try stdout.flush();
 		var res = stdin.takeByte() catch |err| {
 			try stderr.print("Failed reading response: {}\n", .{err});
 			return;
@@ -184,7 +193,8 @@ pub fn main() !void {
 	ssleep(1000);
 
 	const gameFile = fs.openFile(GAME, .{ .mode = .read_only }) catch {
-		try stdout.print("Could not find game! Fixing file...\n", .{});
+		try stdout.print("Could not find game! Fixing files...\n", .{});
+		try stdout.flush();
 		runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
 		return;
 	};
@@ -193,11 +203,13 @@ pub fn main() !void {
 	if (fs.statFile(DATA_DIR)) |s| {
 		if (s.kind != .directory) {
 			try stdout.print("Data path exists but is not a directory! Fixing files...\n", .{});
+			try stdout.flush();
 			runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
 			return;
 		}
 	} else |_| {
 		try stdout.print("Could not find data directory! Fixing files...\n", .{});
+		try stdout.flush();
 		runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
 		return;
 	}
@@ -285,6 +297,7 @@ pub fn main() !void {
 	}
 
 	try stdout.print("Verification done. Game starting...\n", .{});
+	try stdout.flush();
 	ssleep(1000);
 
 	const launcherFlag = "-l";
@@ -305,11 +318,13 @@ pub fn main() !void {
 	// }
 	const exitCode = proc.spawnAndWait() catch |err| {
 		try stdout.print("Could not start game: {}\n", .{err});
+		try stdout.flush();
 		std.process.exit(BAD_EXIT);
 	};
 
 	if (exitCode.Exited != 0) {
 		try stdout.print("Game exited with code {}\n", .{exitCode});
+		try stdout.flush();
 		std.process.exit(BAD_EXIT);
 	}
 }
