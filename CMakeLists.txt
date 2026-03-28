@@ -35,38 +35,40 @@ if(NOT ZIG_EXECUTABLE)
   message(FATAL_ERROR "zig not found; install Zig and ensure 'zig' is on PATH to build .rc resources")
 endif()
 
+
+
 set(RESOURCES_DIR "${CMAKE_SOURCE_DIR}/resources")
 set(BINARY_RES_DIR "${CMAKE_BINARY_DIR}/resources")
 file(MAKE_DIRECTORY ${BINARY_RES_DIR})
 
-set(RC_CLISW "${RESOURCES_DIR}/clisw.rc")
-set(RC_LAUNCHER "${RESOURCES_DIR}/launcher.rc")
-set(RES_CLISW "${RESOURCES_DIR}/clisw.res")
-set(RES_LAUNCHER "${RESOURCES_DIR}/launcher.res")
+# set(RC_CLISW "${RESOURCES_DIR}/clisw.rc")
+# set(RES_CLISW "${RESOURCES_DIR}/clisw.res")
 
-add_custom_command(
-  OUTPUT ${RES_CLISW}
-  COMMAND ${ZIG_EXECUTABLE} rc ${RC_CLISW}
-  DEPENDS ${RC_CLISW}
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  COMMENT "Compiling ${RC_CLISW} -> ${RES_CLISW}"
-)
+# add_custom_command(
+#   OUTPUT ${RES_CLISW}
+#   COMMAND ${ZIG_EXECUTABLE} rc ${RC_CLISW}
+#   DEPENDS ${RC_CLISW} "${CMAKE_SOURCE_DIR}/resources/clisw.ico"
+#   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/resources
+#   COMMENT "Compiling ${RC_CLISW} -> ${RES_CLISW}"
+#   )
 
-add_custom_command(
-  OUTPUT ${RES_LAUNCHER}
-  COMMAND ${ZIG_EXECUTABLE} rc ${RC_LAUNCHER}
-  DEPENDS ${RC_LAUNCHER}
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  COMMENT "Compiling ${RC_LAUNCHER} -> ${RES_LAUNCHER}"
-)
+# set(RC_LAUNCHER "${RESOURCES_DIR}/launcher.rc")
+# set(RES_LAUNCHER "${RESOURCES_DIR}/launcher.res")
 
-add_custom_target(compile_resources DEPENDS ${RES_CLISW} ${RES_LAUNCHER})
+# add_custom_command(
+#   OUTPUT ${RES_LAUNCHER}
+#   COMMAND ${ZIG_EXECUTABLE} rc ${RC_LAUNCHER}
+#   DEPENDS ${RC_LAUNCHER}
+#   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#   COMMENT "Compiling ${RC_LAUNCHER} -> ${RES_LAUNCHER}"
+# )
 
-# Make sure resources are built before the corresponding executables and add .res as sources
-
+# add_custom_target(compile_resources DEPENDS ${RES_CLISW} ${RES_LAUNCHER})
 
 
-
+set(CMAKE_RC_COMPILER "/home/aruel/c_cpp/c/CLISoulWorker/zigrc")
+set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <SOURCE> /home/aruel/c_cpp/c/CLISoulWorker/build/<OBJECT>")
+enable_language(RC)
 
 set(SOURCES
   external/cJSON.c
@@ -82,7 +84,8 @@ set(SOURCES
   control/Keyboard.c
   control/SaveLoad.c
   control/Battle.c
-  ${RES_CLISW}
+  # ${RC_CLISW}
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/clisw.rc
 )
 
 include_directories(headers)
@@ -115,7 +118,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   "${SDK_LIB_UM}/User32.Lib"
   "${SDK_LIB_UM}/kernel32.lib"
 )
-add_dependencies(${PROJECT_NAME} compile_resources)
+# add_dependencies(${PROJECT_NAME} compile_resources)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
