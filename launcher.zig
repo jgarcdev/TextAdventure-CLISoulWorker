@@ -5,6 +5,8 @@ const builtin = @import("builtin");
 
 const isWindows = builtin.os.tag == .windows;
 
+const SEP: []const u8 = if (isWindows) "\\" else "/";
+
 const INSTALLER = if (isWindows) "clisw-installer.exe" else "clisw-installer";
 const LAUNCHER = if (isWindows) "clisw-launcher.exe" else "clisw-launcher";
 const GAME = if (isWindows) "clisw.exe" else "clisw";
@@ -18,10 +20,10 @@ const DATA_DIRS = &[_][]const u8{
 	"maps",
 	"saves",
 	"story",
-	"story/best_showtime",
-	"story/control_zone",
-	"story/r_square",
-	"story/tower_of_greed"
+	"story" ++ SEP ++ "best_showtime",
+	"story" ++ SEP ++ "control_zone",
+	"story" ++ SEP ++ "r_square",
+	"story" ++ SEP ++ "tower_of_greed"
 };
 
 const BAD_EXIT: i32 = 0xff;
@@ -125,12 +127,14 @@ fn runInstaller(allocator: std.mem.Allocator, opt: Opt) !noreturn {
 	var installerDir = std.fs.cwd().openDir(INSTALLER_DIR, .{}) catch |err| {
 		// std.debug.print("Could not open installer directory: {}\n", .{err});
 		try stderr.print("Could not open installer directory: {}\n", .{err});
+		try stderr.flush();
 		std.process.exit(BAD_EXIT);
 	};
 	defer installerDir.close();
 	installerDir.setAsCwd() catch |err| {
 		// std.debug.print("Could not change to installer directory: {}\n", .{err});
 		try stderr.print("Could not change to installer directory: {}\n", .{err});
+		try stderr.flush();
 		std.process.exit(BAD_EXIT);
 	};
 
@@ -191,10 +195,21 @@ fn verifyDataDir(allocator: std.mem.Allocator, cwd: std.fs.Dir) !void {
 		for (0..numDirs) |i| {
 			const dir = DATA_DIRS[i];
 			if (std.mem.eql(u8, entry.path, dir)) {
+				std.debug.print("Found data directory: {s} from {s}\n", .{dir, entry.path});
 				found[i] = true;
 				break;
 			}
 		}
+	}
+
+	if (!found[2]) {
+		// Not finding saves/ is not an error, just make it
+		const savesFullPath = try std.fs.path.join(allocator, &[_][]const u8{DATA_DIR, DATA_DIRS[2]});
+		cwd.makeDir(savesFullPath) catch |err| {
+			try stderr.print("Could not create saves directory: {}\n", .{err});
+			std.process.exit(BAD_EXIT);
+		};
+		found[2] = true;
 	}
 
 	var missing = false;
