@@ -5,7 +5,7 @@
 #include <time.h>
 
 #ifdef _WIN64
-  #include <Windows.h>
+  #include <windows.h>
 #else
   #include <pthread.h>
 #endif

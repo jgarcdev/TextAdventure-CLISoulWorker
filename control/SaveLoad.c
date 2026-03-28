@@ -506,8 +506,13 @@ static STR createMapState() {
     room = table->rooms[i];
     // Creating each room
 
-    char buffer[2];
-    STR idAsChar = itoa(room->id, buffer, 10);
+    char buffer[3];
+    STR idAsChar = NULL;
+#ifdef _WIN64
+    idAsChar = _itoa(room->id, buffer, 10);
+#else
+    idAsChar = itoa(room->id, buffer, 10);
+#endif
 
     cJSON* roomObj = cJSON_AddObjectToObject(mapObj, idAsChar);
     if (!roomObj) return createError(mapObj, idAsChar);

@@ -5,6 +5,7 @@ clisw-installer
 clisw-launcher
 .gdbinit
 *.log
+.zig-cache/
 TODO
 storyboard
 /data/saves/*
