@@ -119,22 +119,20 @@ add_dependencies(${PROJECT_NAME} compile_resources)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-add_executable(clisw-launcher launcher.c external/getopt.c ${RES_LAUNCHER})
-target_include_directories(clisw-launcher PRIVATE ${CMAKE_SOURCE_DIR}/headers ${SDK_INCLUDE_DIRS})
-target_link_directories(clisw-launcher PRIVATE ${X86_LIB_DIR} ${SDK_LIB_UCRT} ${SDK_LIB_UM})
-target_compile_options(clisw-launcher PRIVATE "--target=x86_64-pc-windows-msvc" "-fms-extensions")
-target_link_options(clisw-launcher PRIVATE "-fuse-ld=lld")
-target_link_libraries(clisw-launcher PRIVATE
-  "${X86_LIB_DIR}/libvcruntime.lib"
-  "${SDK_LIB_UCRT}/libucrt.lib"
-  "${X86_LIB_DIR}/libcmt.lib"
-  "${X86_LIB_DIR}/oldnames.lib"
-  "${SDK_LIB_UM}/Uuid.Lib"
-  "${SDK_LIB_UM}/User32.Lib"
-  "${SDK_LIB_UM}/kernel32.lib"
-  "${SDK_LIB_UM}/wininet.lib"
+set(LAUNCHER_BIN "${CMAKE_BINARY_DIR}/clisw-launcher.exe")
+add_custom_command(
+  OUTPUT "${LAUNCHER_BIN}"
+  COMMAND zig build-exe ${CMAKE_SOURCE_DIR}/launcher.zig
+          "${CMAKE_SOURCE_DIR}/resources/launcher.rc"
+          -target x86_64-windows
+          # -O ReleaseSmall
+          # -fstrip
+          -fsingle-threaded
+          --name clisw-launcher
+  DEPENDS ${CMAKE_SOURCE_DIR}/launcher.zig ${RES_LAUNCHER}
 )
-add_dependencies(clisw-launcher compile_resources)
+
+add_custom_target(clisw-launcher ALL DEPENDS "${LAUNCHER_BIN}")
 
 
 add_executable(clisw-installer installer.c external/getopt.c)
@@ -165,7 +163,7 @@ set(PACKAGE_NAME "clisw_build.zip")
 add_custom_target(package
   COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_DIR}
   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}>.exe ${PACKAGE_DIR}/
-  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:clisw-launcher>.exe ${PACKAGE_DIR}/
+  COMMAND ${CMAKE_COMMAND} -E copy "${LAUNCHER_BIN}" ${PACKAGE_DIR}/
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/version ${PACKAGE_DIR}/
   COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_DIR}/data/maps
   COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_DIR}/data/misc

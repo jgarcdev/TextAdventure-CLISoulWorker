@@ -11,10 +11,18 @@ const GAME = if (isWindows) "clisw.exe" else "clisw";
 
 const INSTALLER_DIR = "..";
 const DATA_DIR = "data";
-const MISC_DIR = "data/misc";
-const STORY_DIR = "data/story";
-const MAPS_DIR = "data/maps";
-const SAVES_DIR = "data/saves";
+
+// Array of data directories
+const DATA_DIRS = &[_][]const u8{
+	"misc",
+	"maps",
+	"saves",
+	"story",
+	"story/best_showtime",
+	"story/control_zone",
+	"story/r_square",
+	"story/tower_of_greed"
+};
 
 const BAD_EXIT: i32 = 0xff;
 
@@ -111,7 +119,7 @@ fn checkLatest(allocator: std.mem.Allocator) !bool {
 
 const Opt = enum { FIX, UPDATE };
 
-fn runInstaller(allocator: std.mem.Allocator, opt: Opt) !void {
+fn runInstaller(allocator: std.mem.Allocator, opt: Opt) !noreturn {
 	// std.debug.print("Changing to installer directory...\n", .{});
 
 	var installerDir = std.fs.cwd().openDir(INSTALLER_DIR, .{}) catch |err| {
@@ -149,14 +157,78 @@ fn runInstaller(allocator: std.mem.Allocator, opt: Opt) !void {
 	std.process.exit(0);
 }
 
+fn verifyDataDir(allocator: std.mem.Allocator, cwd: std.fs.Dir) !void {
+	var dataDir = cwd.openDir(DATA_DIR, .{.iterate = true}) catch |err| switch (err) {
+		error.FileNotFound => {
+			try stdout.print("Could not find data! Reinstalling...\n", .{});
+			try stdout.flush();
+			try runInstaller(allocator, .FIX);
+			unreachable;
+		},
+		error.NotDir => {
+			try stderr.print("Data is not a directory! Reinstalling...\n", .{});
+			try runInstaller(allocator, .FIX);
+			unreachable;
+		},
+		else => {
+			try stderr.print("Could not open data directory: {}\n", .{err});
+			std.process.exit(BAD_EXIT);
+		}
+	};
+	defer dataDir.close();
+
+	var dataDirWalker = try dataDir.walk(allocator);
+	defer dataDirWalker.deinit();
+
+	const numDirs = DATA_DIRS.len;
+	var found: [numDirs]bool = undefined;
+	for (0..numDirs) |i| {
+		found[i] = false;
+	}
+
+	while (try dataDirWalker.next()) |entry| {
+		if (entry.kind != .directory) continue;
+		for (0..numDirs) |i| {
+			const dir = DATA_DIRS[i];
+			if (std.mem.eql(u8, entry.path, dir)) {
+				found[i] = true;
+				break;
+			}
+		}
+	}
+
+	var missing = false;
+	for (0..numDirs) |i| {
+		const dir = DATA_DIRS[i];
+		if (!found[i]) {
+			if (!missing) try stderr.print("Missing required data directories:\n", .{});
+			missing = true;
+			try stderr.print(" - {s}\n", .{dir});
+		}
+	}
+	if (missing) {
+		try stderr.flush();
+		runInstaller(allocator, .FIX) catch { std.process.exit(BAD_EXIT); };
+		unreachable;
+	}
+}
+
 pub fn main() !void {
 	var gpa = std.heap.GeneralPurposeAllocator(.{}).init;
 	defer _ = gpa.deinit();
 	const allocator = gpa.allocator();
 
+	switch (builtin.os.tag) {
+		.windows => {
+			w = std.fs.File.stdout().writer(&outBuffer);
+			e = std.fs.File.stderr().writer(&errBuffer);
+		},
+		else => {}
+	}
+
 	// check existence of version file
-	const fs = std.fs.cwd();
-	const vf = fs.openFile("version", .{ .mode = .read_only }) catch {
+	const cwd = std.fs.cwd();
+	const vf = cwd.openFile("version", .{ .mode = .read_only }) catch {
 		// std.debug.print("Could not find version file! Fixing files...\n", .{});
 		try stderr.print("Could not find version file! Fixing files...\n", .{});
 		try stderr.flush();
@@ -192,7 +264,7 @@ pub fn main() !void {
 	try stdout.print("Verifying files and data...\n", .{});
 	ssleep(1000);
 
-	const gameFile = fs.openFile(GAME, .{ .mode = .read_only }) catch {
+	const gameFile = cwd.openFile(GAME, .{ .mode = .read_only }) catch {
 		try stdout.print("Could not find game! Fixing files...\n", .{});
 		try stdout.flush();
 		runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
@@ -200,101 +272,7 @@ pub fn main() !void {
 	};
 	gameFile.close();
 
-	if (fs.statFile(DATA_DIR)) |s| {
-		if (s.kind != .directory) {
-			try stdout.print("Data path exists but is not a directory! Fixing files...\n", .{});
-			try stdout.flush();
-			runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
-			return;
-		}
-	} else |_| {
-		try stdout.print("Could not find data directory! Fixing files...\n", .{});
-		try stdout.flush();
-		runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
-		return;
-	}
-
-
-	if (fs.statFile(MAPS_DIR)) |s| {
-		if (s.kind != .directory) {
-			try stdout.print("Maps path exists but is not a directory! Fixing files...\n", .{});
-			runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
-			return;
-		}
-	} else |_| {
-		try stdout.print("Could not find maps directory! Fixing files...\n", .{});
-		runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
-		return;
-	}
-
-	if (fs.statFile(MISC_DIR)) |s| {
-		if (s.kind != .directory) {
-			try stdout.print("Misc path exists but is not a directory! Fixing files...\n", .{});
-			runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
-			return;
-		}
-	} else |_| {
-		try stdout.print("Could not find misc directory! Fixing files...\n", .{});
-		runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
-		return;
-	}
-
-	if (fs.statFile(STORY_DIR)) |s| {
-		if (s.kind != .directory) {
-			try stdout.print("Story path exists but is not a directory! Fixing files...\n", .{});
-			runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
-			return;
-		}
-	} else |_| {
-		try stdout.print("Could not find story directory! Fixing files...\n", .{});
-		runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
-		return;
-	}
-
-	if (fs.statFile("data/story/control_zone")) |s| {
-		if (s.kind != .directory) {
-			try stdout.print("Control zone path exists but is not a directory! Fixing files...\n", .{});
-			runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
-			return;
-		}
-	} else |_| {
-		try stdout.print("Could not find control zone directory! Fixing files...\n", .{});
-		runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
-		return;
-	}
-
-	if (fs.statFile("data/story/r_square")) |s| {
-		if (s.kind != .directory) {
-			try stdout.print("R Square path exists but is not a directory! Fixing files...\n", .{});
-			runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
-			return;
-		}
-	} else |_| {
-		try stdout.print("Could not find R Square directory! Fixing files...\n", .{});
-		runInstaller(allocator, Opt.FIX) catch { std.process.exit(BAD_EXIT); };
-		return;
-	}
-
-	if (fs.statFile(SAVES_DIR)) |s| {
-		if (s.kind != .directory) {
-			try stdout.print("Saves path exists but is not a directory! Creating saves directory...\n", .{});
-			// Remove the file and create the directory
-			fs.deleteFile(SAVES_DIR) catch |err| {
-				try stdout.print("Could not delete invalid saves file: {}\n", .{err});
-				std.process.exit(BAD_EXIT);
-			};
-			fs.makeDir(SAVES_DIR) catch |err| {
-				try stdout.print("Could not create saves directory: {}\n", .{err});
-				std.process.exit(BAD_EXIT);
-			};
-		}
-	} else |_| {
-		try stdout.print("Could not find saves directory! Creating saves directory...\n", .{});
-		fs.makeDir(SAVES_DIR) catch |err| {
-			try stdout.print("Could not create saves directory: {}\n", .{err});
-			std.process.exit(BAD_EXIT);
-		};
-	}
+	try verifyDataDir(allocator, cwd);
 
 	try stdout.print("Verification done. Game starting...\n", .{});
 	try stdout.flush();
@@ -302,15 +280,15 @@ pub fn main() !void {
 
 	const launcherFlag = "-l";
 
-	const cwd = try std.fs.selfExeDirPathAlloc(allocator);
-	defer allocator.free(cwd);
+	const cwdStr = try std.fs.selfExeDirPathAlloc(allocator);
+	defer allocator.free(cwdStr);
 
-	const gameExe = try std.fs.path.join(allocator, &[_][]const u8{cwd, GAME});
+	const gameExe = try std.fs.path.join(allocator, &[_][]const u8{cwdStr, GAME});
 	defer allocator.free(gameExe);
 	const gameArgs = &[_][]const u8{gameExe, launcherFlag};
 
 	var proc = std.process.Child.init(gameArgs, allocator);
-	proc.cwd = cwd;
+	proc.cwd = cwdStr;
 	// if (proc.cwd) |_cwd| {
 	// std.debug.print("Setting working directory to {s}\n", .{_cwd});
 	// } else {
