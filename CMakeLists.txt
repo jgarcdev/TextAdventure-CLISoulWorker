@@ -14,7 +14,7 @@ if(DEFINED CMAKE_C_COMPILER AND CMAKE_C_COMPILER MATCHES "clang-cl")
   set(SDK_LIB_UM "${XWIN_ROOT}/sdk/lib/um/x86_64")
 
   # Add flags so try_compile and generator tasks link correctly.
-  set(_clang_cl_cflags "--target=x86_64-pc-windows-msvc -fms-extensions")
+  set(_clang_cl_cflags "--target=x86_64-pc-windows-msvc -fms-extensions -Wno-nonportable-include-path")
   set(_clang_cl_ldflags "-fuse-ld=lld ${X86_LIB_DIR}/libvcruntime.lib ${SDK_LIB_UCRT}/libucrt.lib ${X86_LIB_DIR}/libcmt.lib ${X86_LIB_DIR}/oldnames.lib ${SDK_LIB_UM}/Uuid.Lib ${SDK_LIB_UM}/User32.Lib ${SDK_LIB_UM}/kernel32.lib")
 
   string(APPEND CMAKE_C_FLAGS " ${_clang_cl_cflags}")
@@ -104,7 +104,7 @@ endif()
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${SDK_INCLUDE_DIRS})
 target_link_directories(${PROJECT_NAME} PRIVATE ${X86_LIB_DIR} ${SDK_LIB_UCRT} ${SDK_LIB_UM})
-target_compile_options(${PROJECT_NAME} PRIVATE "--target=x86_64-pc-windows-msvc" "-fms-extensions")
+target_compile_options(${PROJECT_NAME} PRIVATE "--target=x86_64-pc-windows-msvc" "-fms-extensions" "-Wno-nonportable-include-path")
 target_link_options(${PROJECT_NAME} PRIVATE "-fuse-ld=lld")
 target_link_libraries(${PROJECT_NAME} PRIVATE
   "${X86_LIB_DIR}/libvcruntime.lib"
@@ -138,7 +138,7 @@ add_custom_target(clisw-launcher ALL DEPENDS "${LAUNCHER_BIN}")
 add_executable(clisw-installer installer.c external/getopt.c)
 target_include_directories(clisw-installer PRIVATE ${CMAKE_SOURCE_DIR}/headers ${SDK_INCLUDE_DIRS})
 target_link_directories(clisw-installer PRIVATE ${X86_LIB_DIR} ${SDK_LIB_UCRT} ${SDK_LIB_UM})
-target_compile_options(clisw-installer PRIVATE "--target=x86_64-pc-windows-msvc" "-fms-extensions")
+target_compile_options(clisw-installer PRIVATE "--target=x86_64-pc-windows-msvc" "-fms-extensions" "-Wno-nonportable-include-path")
 target_link_options(clisw-installer PRIVATE "-fuse-ld=lld")
 target_link_libraries(clisw-installer PRIVATE
   "${X86_LIB_DIR}/libvcruntime.lib"
