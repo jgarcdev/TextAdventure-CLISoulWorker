@@ -210,6 +210,7 @@ fn verifyDataDir(allocator: std.mem.Allocator, cwd: std.fs.Dir) !void {
 			std.process.exit(BAD_EXIT);
 		};
 		found[2] = true;
+		allocator.free(savesFullPath);
 	}
 
 	var missing = false;
