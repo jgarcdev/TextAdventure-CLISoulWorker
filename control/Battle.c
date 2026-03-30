@@ -315,40 +315,6 @@ static bool validOptions(char attack, Skill** skillActivated, bool* basicUsed) {
   return false;
 }
 
-#ifdef _WIN64
-  #define _THREAD_RETURN DWORD WINAPI
-#else
-  #define _THREAD_RETURN void*
-#endif
-
-/**
- * Goes through all the skills and decreases its cooldown timer.
- * @param _skills The skill array
- * @return NULL
- */
-static _THREAD_RETURN decreaseCD(void* _skills) {
-  if (!_skills) {
-    // Decrease player's skills' CD
-    for (int i = 0; i < EQUIPPED_SKILL_COUNT; i++) {
-      if (player->skills->equippedSkills[i]) {
-        if (player->skills->equippedSkills[i]->cdTimer > 0) player->skills->equippedSkills[i]->cdTimer--;
-      }
-    }
-  } else {
-    Skill* skills = (Skill*) _skills;
-
-    // Decrease boss's skills' CD
-    for (int i = 0; i < BOSS_SKILL_COUNT; i++) {
-      if (skills[i].cdTimer > 0) skills[i].cdTimer--;
-    }
-  }
-
-#ifdef _WIN64
-  return 0;
-#else
-  return NULL;
-#endif
-}
 
 bool bossBattle(Boss* boss) {
   ushort playerAtk, enemyAtk;
@@ -398,33 +364,18 @@ bool bossBattle(Boss* boss) {
     player->hp -= enemyAtk;
     printf("%s: %d/%d\n", player->name, player->hp, player->maxHP);
 
-    // Decrease all skills' CD
-#ifdef _WIN64
-    HANDLE playerCDThread, bossCDThread;
-    DWORD thread1D, thread2D;
 
-    playerCDThread = CreateThread(NULL, 0, decreaseCD, NULL, 0, &thread1D);
-    if (!playerCDThread) handleError(ERR_MEM, FATAL, "Could not create thread!\n");
-    bossCDThread = CreateThread(NULL, 0, decreaseCD, (void*) boss->skills, 0, &thread2D);
-    if (!bossCDThread) handleError(ERR_MEM, FATAL, "Could not create thread!\n");
+    // Decrease player's skills' CD
+    for (int i = 0; i < EQUIPPED_SKILL_COUNT; i++) {
+      if (player->skills->equippedSkills[i]) {
+        if (player->skills->equippedSkills[i]->cdTimer > 0) player->skills->equippedSkills[i]->cdTimer--;
+      }
+    }
 
-    WaitForSingleObject(playerCDThread, INFINITE);
-    WaitForSingleObject(bossCDThread, INFINITE);
-
-    CloseHandle(playerCDThread);
-    CloseHandle(bossCDThread);
-#else
-    pthread_t playerCDThread, bossCDThread;
-
-    int threadRet = pthread_create(&playerCDThread, NULL, decreaseCD, NULL);
-    if (threadRet != 0) handleError(ERR_MEM, FATAL, "Could not create thread!\n");
-    
-    threadRet = pthread_create(&bossCDThread, NULL, decreaseCD, (void*) boss->skills);
-    if (threadRet != 0) handleError(ERR_MEM, FATAL, "Could not create thread!\n");
-
-    pthread_join(playerCDThread, NULL);
-    pthread_join(bossCDThread, NULL);
-#endif
+    // Decrease boss's skills' CD
+    for (int i = 0; i < BOSS_SKILL_COUNT; i++) {
+      if (boss->skills[i].cdTimer > 0) boss->skills[i].cdTimer--;
+    }
   }
 
   if (defeat) {
