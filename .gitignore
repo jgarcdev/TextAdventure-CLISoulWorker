@@ -13,6 +13,9 @@ test.c
 CLISW
 build/
 resources/*.res
+*.dll
+*.pdb
+*.so
 
 mate
 
