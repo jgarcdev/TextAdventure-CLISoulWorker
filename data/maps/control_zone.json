@@ -4,7 +4,7 @@
 		"isEntry":	1,
 		"storyfile":	"entry.story",
 		"info":	"at the entry of control zone.",
-		"exits":	[-1, 1, -1, -1],
+		"exits":	[1, 5, 3, -1],
 		"hasBoss":	0,
 		"loot":	[],
 		"enemy":	[]
@@ -13,7 +13,7 @@
 		"isEntry":	0,
 		"storyfile":	"",
 		"info":	"some other room.",
-		"exits":	[2, 3, -1, 0],
+		"exits":	[-1, 2, 0, -1],
 		"hasBoss":	0,
 		"loot":	[],
 		"enemy":	[]
@@ -22,37 +22,270 @@
 		"isEntry":	0,
 		"storyfile":	"",
 		"info":	"some other other room.",
-		"exits":	[-1, -1, 1, -1],
+		"exits":	[-1, -1, -1, 1],
+		"hasBoss":	0,
+		"loot":	[],
+		"enemy":	[{
+				"name":	"SoulJunk A",
+				"xpPoints":	15,
+				"hp":	[1, 3],
+				"lvl":	1,
+				"stats":	{
+					"ATK":	[1, 2],
+					"ACC":	[0, 1],
+					"ATK_CRIT":	[0],
+					"ATK_CRIT_DMG":	[0, 1],
+					"DEF":	[1, 2]
+				}
+			}]
+	},
+	"3":	{
+		"isEntry":	0,
+		"storyfile":	"",
+		"info":	"room 3",
+		"exits":	[0, 6, -1, 4],
 		"hasBoss":	0,
 		"loot":	[],
 		"enemy":	[]
 	},
-	"3":	{
+	"4":	{
+		"isEntry":	0,
+		"storyfile":	"",
+		"info":	"room 4",
+		"exits":	[-1, 3, -1, -1],
+		"hasBoss":	0,
+		"loot":	[{
+				"count":	9,
+				"type":	9,
+				"item":	{
+					"description":	"Slime. Sold for 100 DZ"
+				}
+			}, {
+				"count":	10,
+				"type":	6,
+				"item":	{
+					"type":	0,
+					"description":	"This is a description for deka HP Kits. Heals for "
+				}
+			}, {
+				"count":	1,
+				"type":	1,
+				"item":	{
+					"name":	"Souru",
+					"atk":	1,
+					"acc":	1,
+					"atk_crit":	0.00999999977648258,
+					"atk_crit_dmg":	1,
+					"lvl":	1,
+					"upgrades":	0,
+					"durability":	100
+				}
+			}],
+		"enemy":	[]
+	},
+	"5":	{
+		"isEntry":	0,
+		"storyfile":	"",
+		"info":	"room 5",
+		"exits":	[-1, 8, 6, 0],
+		"hasBoss":	0,
+		"loot":	[],
+		"enemy":	[{
+				"name":	"SoulJunk B",
+				"xpPoints":	1,
+				"hp":	[2, 3],
+				"lvl":	2,
+				"stats":	{
+					"ATK":	[2, 3],
+					"ACC":	[1, 3],
+					"ATK_CRIT":	[0],
+					"ATK_CRIT_DMG":	[2, 3],
+					"DEF":	[1, 3]
+				}
+			}]
+	},
+	"6":	{
+		"isEntry":	0,
+		"storyfile":	"",
+		"info":	"room 6",
+		"exits":	[5, 9, -1, 3],
+		"hasBoss":	0,
+		"loot":	[],
+		"enemy":	[{
+				"name":	"SoulJunk B",
+				"xpPoints":	4,
+				"hp":	[2, 3],
+				"lvl":	2,
+				"stats":	{
+					"ATK":	[2, 3],
+					"ACC":	[1, 3],
+					"ATK_CRIT":	[0],
+					"ATK_CRIT_DMG":	[2, 3],
+					"DEF":	[1, 3]
+				}
+			}]
+	},
+	"7":	{
+		"isEntry":	0,
+		"storyfile":	"",
+		"info":	"room 7",
+		"exits":	[-1, -1, 8, -1],
+		"hasBoss":	0,
+		"loot":	[{
+				"count":	2,
+				"type":	8,
+				"item":	{
+					"rank":	1,
+					"type":	1,
+					"description":	"Used for upgrading (null) Armor"
+				}
+			}, {
+				"count":	4,
+				"type":	6,
+				"item":	{
+					"type":	0,
+					"description":	"This is a description for deka HP Kits. Heals for "
+				}
+			}, {
+				"count":	1,
+				"type":	2,
+				"item":	{
+					"name":	"Hel",
+					"type":	0,
+					"acc":	0,
+					"def":	1,
+					"lvl":	1
+				}
+			}, {
+				"count":	1,
+				"type":	6,
+				"item":	{
+					"type":	1,
+					"description":	"Description for mega HP Kits. Heals for "
+				}
+			}],
+		"enemy":	[]
+	},
+	"8":	{
+		"isEntry":	0,
+		"storyfile":	"",
+		"info":	"room 8",
+		"exits":	[7, -1, -1, 5],
+		"hasBoss":	0,
+		"loot":	[],
+		"enemy":	[]
+	},
+	"9":	{
+		"isEntry":	0,
+		"storyfile":	"",
+		"info":	"room 9",
+		"exits":	[-1, -1, 10, 6],
+		"hasBoss":	0,
+		"loot":	[],
+		"enemy":	[]
+	},
+	"10":	{
+		"isEntry":	0,
+		"storyfile":	"",
+		"info":	"room 10",
+		"exits":	[9, 13, 12, 11],
+		"hasBoss":	0,
+		"loot":	[],
+		"enemy":	[{
+				"name":	"SoulJunk C",
+				"xpPoints":	3,
+				"hp":	[3, 4],
+				"lvl":	3,
+				"stats":	{
+					"ATK":	[3, 4],
+					"ACC":	[2, 4],
+					"ATK_CRIT":	[0],
+					"ATK_CRIT_DMG":	[1, 2],
+					"DEF":	[2, 4]
+				}
+			}]
+	},
+	"11":	{
+		"isEntry":	0,
+		"storyfile":	"",
+		"info":	"room 11",
+		"exits":	[-1, 10, -1, -1],
+		"hasBoss":	0,
+		"loot":	[{
+				"count":	4,
+				"type":	6,
+				"item":	{
+					"type":	0,
+					"description":	"This is a description for deka HP Kits. Heals for "
+				}
+			}, {
+				"count":	9,
+				"type":	9,
+				"item":	{
+					"description":	"Slime. Sold for 100 DZ"
+				}
+			}, {
+				"count":	1,
+				"type":	6,
+				"item":	{
+					"type":	1,
+					"description":	"Description for mega HP Kits. Heals for "
+				}
+			}],
+		"enemy":	[]
+	},
+	"12":	{
+		"isEntry":	0,
+		"storyfile":	"",
+		"info":	"room 12",
+		"exits":	[10, -1, -1, -1],
+		"hasBoss":	0,
+		"loot":	[{
+				"count":	3,
+				"type":	8,
+				"item":	{
+					"rank":	1,
+					"type":	1,
+					"description":	"Used for upgrading (null) Armor"
+				}
+			}],
+		"enemy":	[]
+	},
+	"13":	{
+		"isEntry":	0,
+		"storyfile":	"",
+		"info":	"room 13",
+		"exits":	[-1, 14, -1, 10],
+		"hasBoss":	0,
+		"loot":	[],
+		"enemy":	[]
+	},
+	"14":	{
 		"isEntry":	0,
 		"storyfile":	"boss.story",
-		"info":	"boss room!",
-		"exits":	[-1, -1, -1, 1],
+		"info":	"room 14",
+		"exits":	[-1, -1, -1, 13],
 		"hasBoss":	1,
 		"loot":	[],
 		"enemy":	[{
 				"name":	"Wolf",
 				"xpPoints":	5,
-				"hp":	[5],
+				"hp":	[4],
 				"lvl":	4,
 				"stats":	{
-					"ATK":	[1, 3],
-					"ACC":	[1],
-					"ATK_CRIT":	[0.2,0.3],
-					"ATK_CRIT_DMG":	[1, 2],
-					"DEF":	[2, 3]
+					"ATK":	[3, 5],
+					"ACC":	[2, 5],
+					"ATK_CRIT":	[0],
+					"ATK_CRIT_DMG":	[2, 4],
+					"DEF":	[3, 5]
 				},
 				"gear":	{
 					"soulweapon":	{
-						"name":	"SoulWeapon A",
-						"atk":	5,
-						"acc":	3,
-						"atk_crit":	0.5,
-						"atk_crit_dmg":	4,
+						"name":	"Soulweapon A",
+						"atk":	3,
+						"acc":	2,
+						"atk_crit":	0.079999998211860657,
+						"atk_crit_dmg":	2,
 						"lvl":	4,
 						"upgrades":	0,
 						"durability":	100
@@ -60,80 +293,80 @@
 					"helmet":	{
 						"name":	"Helmet A",
 						"type":	0,
-						"acc":	1,
-						"def":	2,
-						"lvl":	5
+						"acc":	2,
+						"def":	1,
+						"lvl":	4
 					},
 					"shoulder_guard":	{
-						"name":	"Shoulder Guard A",
+						"name":	"Guard A",
 						"type":	1,
-						"acc":	1,
-						"def":	1,
-						"lvl":	5
+						"acc":	3,
+						"def":	2,
+						"lvl":	4
 					},
 					"chestplate":	{
-						"name":	"ChestPlate A",
+						"name":	"Chest A",
 						"type":	2,
 						"acc":	1,
 						"def":	3,
-						"lvl":	5
+						"lvl":	4
 					},
 					"boots":	{
 						"name":	"Boots A",
 						"type":	3,
-						"acc":	0,
+						"acc":	1,
 						"def":	2,
-						"lvl":	5
+						"lvl":	4
 					}
 				},
 				"skills":	[{
-						"name":	"Skill 1",
-						"description":	"Skill 1 desc",
-						"lvl": 0,
-						"cooldown":	1,
+						"name":	"Dash",
+						"description":	"Dashes towards the opponent.",
+						"lvl":	0,
+						"cooldown":	2,
 						"id":	1,
 						"activeEffect1":	0,
-						"activeEffect2":	4,
+						"activeEffect2":	3,
 						"effect1":	3,
-						"effect2":	3.2
+						"effect2":	1
 					}, {
-						"name":	"Skill 2",
-						"description":	"Skill 2 desc",
-						"lvl": 0,
-						"cooldown":	1,
+						"name":	"Swipe",
+						"description":	"Turns 360, swipping everything with its tail.",
+						"lvl":	0,
+						"cooldown":	2,
 						"id":	2,
 						"activeEffect1":	1,
-						"activeEffect2":	2,
-						"effect1":	4,
-						"effect2":	3
+						"activeEffect2":	4,
+						"effect1":	2,
+						"effect2":	0.02
 					}, {
-						"name":	"Skill 3",
-						"description":	"Skill 3 desc",
-						"lvl": 0,
-						"cooldown":	1,
+						"name":	"Howl",
+						"description":	"Howls, generating electricity around.",
+						"lvl":	0,
+						"cooldown":	4,
 						"id":	3,
 						"activeEffect1":	0,
 						"activeEffect2":	2,
-						"effect1":	3,
-						"effect2":	3
+						"effect1":	4,
+						"effect2":	4
 					}, {
-						"name":	"Skill 4",
-						"description":	"Skill 4 desc",
-						"lvl": 0,
+						"name":	"Chomp",
+						"description":	"Bites down.",
+						"lvl":	0,
 						"cooldown":	1,
 						"id":	4,
 						"activeEffect1":	0,
-						"activeEffect2":	2,
-						"effect1":	3,
-						"effect2":	2
+						"activeEffect2":	3,
+						"effect1":	1,
+						"effect2":	1
 					}, {
-						"name":	"Skill 5",
-						"description":	"Skill 5 desc",
-						"lvl": 0,
-						"cooldown":	1,
+						"name":	"Rapid",
+						"description":	"Dashes all over, quickly.",
+						"lvl":	0,
+						"cooldown":	5,
 						"id":	5,
 						"activeEffect1":	0,
-						"activeEffect2":	2,
+						"activeEffect2":	4,
 						"effect1":	3,
 						"effect2":	4
 					}]
