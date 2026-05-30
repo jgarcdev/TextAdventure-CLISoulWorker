@@ -1,3 +1,2 @@
-creator
-*.exe
-*.pdb
+.zig-cache/
+out/

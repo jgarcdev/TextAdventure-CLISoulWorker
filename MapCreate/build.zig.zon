@@ -1,0 +1,12 @@
+.{
+    .name = .MapCreate,
+    .version = "0.15.2",
+    .dependencies = .{
+        .dvui = .{
+            .url = "git+https://github.com/david-vanderson/dvui?ref=zig15#e2e942ba1f46c92c944bdfb8d0ec625e8ac8cbf8",
+            .hash = "dvui-0.4.0-AQFJmSH-4QDqLiMnHIyuLm5ZDceiDWzlvntWFyPSH05P",
+        },
+    },
+    .paths = .{""},
+    .fingerprint = 0x45c49e50d45ee0,
+}
