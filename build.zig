@@ -40,9 +40,7 @@ pub fn build(b: *std.Build) void {
 
   exe.addIncludePath(b.path("headers"));
 
-  exe.addWin32ResourceFile(.{
-    .file = b.path("resources/clisw.rc"),
-  });
+  exe.root_module.addWin32ResourceFile(.{.file = b.path("resources/clisw.rc")});
 
   exe.linkLibC();
 

@@ -35,11 +35,12 @@ if(NOT ZIG_EXECUTABLE)
   message(FATAL_ERROR "zig not found; install Zig and ensure 'zig' is on PATH to build .rc resources")
 endif()
 
+## The following is superseded by Zig. However, cmake still builds it by calling Zig instead. ##
 
 
-set(RESOURCES_DIR "${CMAKE_SOURCE_DIR}/resources")
-set(BINARY_RES_DIR "${CMAKE_BINARY_DIR}/resources")
-file(MAKE_DIRECTORY ${BINARY_RES_DIR})
+# set(RESOURCES_DIR "${CMAKE_SOURCE_DIR}/resources")
+# set(BINARY_RES_DIR "${CMAKE_BINARY_DIR}/resources")
+# file(MAKE_DIRECTORY ${BINARY_RES_DIR})
 
 # set(RC_CLISW "${RESOURCES_DIR}/clisw.rc")
 # set(RES_CLISW "${RESOURCES_DIR}/clisw.res")
@@ -66,9 +67,9 @@ file(MAKE_DIRECTORY ${BINARY_RES_DIR})
 # add_custom_target(compile_resources DEPENDS ${RES_CLISW} ${RES_LAUNCHER})
 
 
-set(CMAKE_RC_COMPILER "/home/aruel/c_cpp/c/CLISoulWorker/zigrc")
-set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <SOURCE> /home/aruel/c_cpp/c/CLISoulWorker/build/<OBJECT>")
-enable_language(RC)
+# set(CMAKE_RC_COMPILER "/home/aruel/c_cpp/c/CLISoulWorker/zigrc")
+# set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <SOURCE> /home/aruel/c_cpp/c/CLISoulWorker/build/<OBJECT>")
+# enable_language(RC)
 
 set(SOURCES
   external/cJSON.c
@@ -103,6 +104,7 @@ if(NOT DEFINED CMAKE_C_COMPILER OR NOT CMAKE_C_COMPILER MATCHES "clang-cl")
   message(FATAL_ERROR "CMAKE_C_COMPILER is not set to clang-cl. Please set CMAKE_C_COMPILER to clang-cl for cross-compilation.")
 endif()
 
+## Building the game itself ##
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${SDK_INCLUDE_DIRS})
@@ -122,6 +124,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
+## Building the launcher using zig ##
+
 set(LAUNCHER_BIN "${CMAKE_BINARY_DIR}/clisw-launcher.exe")
 add_custom_command(
   OUTPUT "${LAUNCHER_BIN}"
@@ -137,6 +141,7 @@ add_custom_command(
 
 add_custom_target(clisw-launcher ALL DEPENDS "${LAUNCHER_BIN}")
 
+## Building the installer ##
 
 add_executable(clisw-installer installer.c external/getopt.c)
 target_include_directories(clisw-installer PRIVATE ${CMAKE_SOURCE_DIR}/headers ${SDK_INCLUDE_DIRS})
@@ -154,6 +159,7 @@ target_link_libraries(clisw-installer PRIVATE
 )
 
 
+## Packaging ##
 
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -lpthread
+CFLAGS = -Wall
 
 INCLUDES = -I. -Iheaders
 
@@ -10,6 +10,8 @@ SRCS = external/cJSON.c main.c structures/RoomTable.c control/Setup.c structures
 HEADERS = headers/cJSON.h headers/Setup.h headers/SoulWorker.h headers/Maze.h headers/Error.h \
 		headers/Keyboard.h headers/SaveLoad.h headers/LoadJSON.h headers/DArray.h headers/Misc.h \
 		headers/Battle.h headers/Colors.h
+
+LIBS = -lm -lalloc
 
 OBJS = $(SRCS:.c=.o)
 OBJS := $(OBJS:.s=.o)
@@ -23,7 +25,7 @@ LAUNCHER = clisw-launcher
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) -lm
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LIBS)
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@

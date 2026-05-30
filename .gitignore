@@ -1,22 +1,23 @@
-/.vscode
-*.o
-clisw
-clisw-installer
-clisw-launcher
-.gdbinit
-*.log
+.vscode/
+*.cache/
 .zig-cache/
+data/saves/*
+resources/*.res
+build/
+
+.gdbinit
 TODO
 storyboard
-/data/saves/*
-test.c
-CLISW
-build/
-resources/*.res
+*.log
+*.o
 *.dll
 *.pdb
 *.so
 
-mate
+test.c
+move.sh
 
+clisw
+clisw-installer
+clisw-launcher
 screen
